@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # 🏃‍♂️ HealthTracker
 
 <p align="center">
@@ -214,3 +215,6 @@ SOFTWARE.
 
 </div>
 
+=======
+# healthtracker
+>>>>>>> 52b3cd61138c8865be6424fa2a6bdc269f718310
