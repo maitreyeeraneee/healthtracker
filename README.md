@@ -18,13 +18,11 @@
 [![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-blue?style=for-the-badge)]()
 
 <br/>
-
 <!-- ══════════════════════════════════════════════════════════════════════════ -->
 <!--                                HEADER                                      -->
 <!-- ══════════════════════════════════════════════════════════════════════════ -->
 
 <br/>
-
 # 🏃‍♂️ HealthTracker
 
 ### Your Personal AI-Powered Health & Nutrition Companion
@@ -247,8 +245,8 @@ git push origin feature/amazing-feature
 
 | Contact | Link |
 |:--------|:-----|
-| 🐙 **GitHub** | [@Maitreyee](https://github.com/Maitreyee) |
-| 💼 **LinkedIn** | [Maitreyee](https://linkedin.com/in/maitreyee) |
+| 🐙 **GitHub** | [@Maitreyee](https://github.com/maitreyeeraneee) |
+| 💼 **LinkedIn** | [Maitreyee](https://www.linkedin.com/in/maitreyeerane/) |
 
 ---
 
