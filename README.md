@@ -16,13 +16,8 @@
 [![Python](https://img.shields.io/badge/Python-3.8%2B-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
 [![Streamlit](https://img.shields.io/badge/Streamlit-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white)](https://streamlit.io/)
 [![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-blue?style=for-the-badge)]()
-[![Last Commit](https://img.shields.io/github/last-commit/Maitreyee/HealthTracker?style=for-the-badge&logo=github)]()
 
 <br/>
-
-![GitHub stars](https://img.shields.io/github/stars/Maitreyee/HealthTracker?style=for-the-badge&logo=github)
-![GitHub forks](https://img.shields.io/github/forks/Maitreyee/HealthTracker?style=for-the-badge&logo=github)
-![GitHub issues](https://img.shields.io/github/issues/Maitreyee/HealthTracker?style=for-the-badge&logo=github)
 
 <!-- ══════════════════════════════════════════════════════════════════════════ -->
 <!--                                HEADER                                      -->
@@ -269,7 +264,7 @@ git push origin feature/amazing-feature
 
 <br/>
 
-### ⭐ Don't forget to star this repository if you found it useful!
+### ⭐ Star this repo if you found it useful!!
 
 <br/>
 
