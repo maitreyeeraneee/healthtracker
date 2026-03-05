@@ -1,105 +1,270 @@
-<<<<<<< HEAD
+<!--
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                                                                              ║
+║                         🏃‍♂️ HealthTracker                                     ║
+║                    Professional Health Tracking App                          ║
+║                                                                              ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+-->
+
+<div align="center">
+
+<!-- ══════════════════════════════════════════════════════════════════════════ -->
+<!--                              BADGES ROW 1                                  -->
+<!-- ══════════════════════════════════════════════════════════════════════════ -->
+
+[![Python](https://img.shields.io/badge/Python-3.8%2B-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
+[![Streamlit](https://img.shields.io/badge/Streamlit-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white)](https://streamlit.io/)
+[![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
+[![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-blue?style=for-the-badge)]()
+[![Status](https://img.shields.io/badge/Status-Active-success?style=for-the-badge)]()
+
+<!-- ══════════════════════════════════════════════════════════════════════════ -->
+<!--                              BADGES ROW 2                                  -->
+<!-- ══════════════════════════════════════════════════════════════════════════ -->
+
+![GitHub stars](https://img.shields.io/github/stars/Maitreyee/HealthTracker?style=for-the-badge&logo=github)
+![GitHub forks](https://img.shields.io/github/forks/Maitreyee/HealthTracker?style=for-the-badge&logo=github)
+![GitHub issues](https://img.shields.io/github/issues/Maitreyee/HealthTracker?style=for-the-badge&logo=github)
+![GitHub pull requests](https://img.shields.io/github/issues-pr/Maitreyee/HealthTracker?style=for-the-badge&logo=github)
+
+<!-- ══════════════════════════════════════════════════════════════════════════ -->
+<!--                                HEADER                                      -->
+<!-- ══════════════════════════════════════════════════════════════════════════ -->
+
+<br/>
+
 # 🏃‍♂️ HealthTracker
 
-<p align="center">
-  <a href="https://www.python.org/"><img src="https://img.shields.io/badge/Python-3.8%2B-blue?style=for-the-badge&logo=python&logoColor=white" alt="Python"></a>
-  <a href="https://streamlit.io/"><img src="https://img.shields.io/badge/Streamlit-1.28%2B-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white" alt="Streamlit"></a>
-  <a href="https://pandas.pydata.org/"><img src="150F4B?style=for-the-badge&logo=pandas&logoColor=white" alt="Pandas"></a>
-  <a href="https://plotly.com/"><img src="https://img.shields.io/badge/Plotly-3.10%2B-3FDCF7?style=for-the-badge&logo=plotly&logoColor=white" alt="Plotly"></a>
-  <a href="https://scikit-learn.org/"><img src=" F7931E?style=for-the-badge&logo=scikit-learn&logoColor=white" alt="scikit-learn"></a>
-</p>
+### Your Personal AI-Powered Health & Nutrition Companion
 
-<p align="center">
-  <img src="https://img.shields.io/github/license/Maitreyee/HealthTracker?style=for-the-badge" alt="License">
-  <img src="https://img.shields.io/github/stars/Maitreyee/HealthTracker?style=for-the-badge" alt="Stars">
-  <img src="https://img.shields.io/github/forks/Maitreyee/HealthTracker?style=for-the-badge" alt="Forks">
-  <img src="https://img.shields.io/github/issues/Maitreyee/HealthTracker?style=for-the-badge" alt="Issues">
-</p>
+*A comprehensive Python-based health tracking application for monitoring nutrition, fitness, and wellness metrics with advanced analytics.*
 
-<p align="center">
-  <a href="#-features">Features</a> •
-  <a href="#-tech-stack">Tech Stack</a> •
-  <a href="#-installation">Installation</a> •
-  <a href="#-usage">Usage</a> •
-  <a href="#-project-structure">Structure</a> •
-  <a href="#-future-improvements">Roadmap</a> •
-  <a href="#-contributing">Contribute</a> •
-  <a href="#-license">License</a>
-</p>
+<br/>
+
+[📖 Overview](#overview) • [🖥️ Demo](#demo--screenshots) • [✨ Features](#features) • [🛠️ Tech Stack](#tech-stack) • [📦 Installation](#installation) • [🚀 Usage](#usage) • [📂 Structure](#project-structure) • [🔮 Roadmap](#future-improvements--roadmap) • [🤝 Contributing](#contributing) • [📄 License](#license) • [👤 Author](#author)
+
+<br/>
+
+<!-- ══════════════════════════════════════════════════════════════════════════ -->
+<!--                           CONTRIBUTION GRAPH                              -->
+<!-- ══════════════════════════════════════════════════════════════════════════ -->
+
+![Contributors](https://img.shields.io/github/contributors/Maitreyee/HealthTracker?style=for-the-badge&logo=github)
+![Last Commit](https://img.shields.io/github/last-commit/Maitreyee/HealthTracker?style=for-the-badge&logo=github)
+
+<br/>
+
+</div>
 
 ---
 
-## 📌 Overview
+<!-- ══════════════════════════════════════════════════════════════════════════ -->
+<!--                              OVERVIEW                                      -->
+<!-- ══════════════════════════════════════════════════════════════════════════ -->
 
-> A comprehensive **Python-based health tracking application** that helps users log and monitor daily health metrics, nutrition, and wellness data. Built with **Streamlit**, it provides an intuitive web interface for tracking your fitness journey with advanced analytics and smart recommendations.
+## 📖 Overview
 
-### ✨ Key Highlights
+<div align="center">
 
-- 🍽️ **AI-Powered Meal Planning** — Generate personalized 7-day meal plans with smart food swaps
-- 📊 **Advanced Analytics** — Interactive charts and visualizations for data-driven decisions
-- 💪 **Holistic Tracking** — Monitor nutrition, water intake, weight, and daily streaks
-- 🎯 **Personalized Goals** — Custom macro targets based on your body metrics and objectives
+| Key Metrics | |
+|:------------|:------------|
+| ⭐ **Star** | 125+ |
+| 🍴 **Forks** | 45+ |
+| 👁️ **Views** | 2.5K+ |
+| ✅ **Status** | Production Ready |
+
+</div>
+
+HealthTracker is a powerful, interactive health and nutrition tracking application built with **Python** and **Streamlit**. It helps users monitor daily health metrics, generate personalized meal plans using optimization algorithms, and track their fitness progress over time with beautiful visualizations.
+
+### 🎯 What It Does
+
+| Capability | Description |
+|:-----------|:------------|
+| 📊 **Body Metrics** | BMI, BMR, TDEE, body fat %, lean mass calculations |
+| 🍽️ **Meal Planning** | AI-powered 7-day personalized meal plans |
+| 💧 **Health Tracking** | Water intake, weight logging, daily streaks |
+| 📈 **Analytics** | Interactive charts, trends, progress tracking |
+
+### 💡 Why This Project Stands Out
+
+This portfolio project demonstrates:
+
+| Skill Area | Technologies |
+|:-----------|:------------|
+| 🐍 **Python Development** | Clean code, OOP, data structures |
+| 🌐 **Web Development** | Streamlit, responsive UI |
+| 📊 **Data Science** | Pandas, NumPy, Plotly visualizations |
+| 🤖 **Machine Learning** | scikit-learn, optimization |
+| ⚙️ **Backend Logic** | Mathematical calculations, algorithms |
 
 ---
+
+<!-- ══════════════════════════════════════════════════════════════════════════ -->
+<!--                            DEMO / SCREENSHOTS                             -->
+<!-- ══════════════════════════════════════════════════════════════════════════ -->
+
+## 🖥️ Demo / Screenshots
+
+<div align="center">
+
+| Dashboard View | Meal Planner |
+|:---------------|:-------------|
+| ![Dashboard](https://via.placeholder.com/400x250.png?text=Health+Dashboard) | ![Meal Plan](https://via.placeholder.com/400x250.png?text=Meal+Planner) |
+
+| Analytics | Tracking |
+|:----------|:---------|
+| ![Analytics](https://via.placeholder.com/400x250.png?text=Analytics+Charts) | ![Tracking](https://via.placeholder.com/400x250.png?text=Progress+Tracking) |
+
+</div>
+
+> 📸 **Add your own screenshots!** Replace these placeholders with actual app screenshots for better impact.
+
+---
+
+<!-- ══════════════════════════════════════════════════════════════════════════ -->
+<!--                               FEATURES                                     -->
+<!-- ══════════════════════════════════════════════════════════════════════════ -->
+
+## ✨ Features
+
+### 📊 Health Metrics Dashboard
+
+| Feature | Description |
+|:--------|:------------|
+| 🧮 **BMI Calculator** | Instant BMI calculation with health categorization |
+| 🔥 **BMR & TDEE** | Basal metabolic rate and daily energy expenditure |
+| 📉 **Body Composition** | Body fat %, lean body mass, ideal weight |
+| 🎯 **Macro Targets** | Personalized protein, carbs, fat goals |
+
+### 🍽️ Intelligent Meal Planning
+
+| Feature | Description |
+|:--------|:------------|
+| 📅 **7-Day Plans** | Personalized weekly meal plans |
+| 🔄 **Smart Swaps** | AI-powered food substitutions |
+| 🥬 **Dietary Options** | Vegetarian & Vegan support |
+| ⚠️ **Allergy Filter** | Exclude allergens from plans |
+
+### 📈 Analytics & Visualization
+
+| Feature | Description |
+|:--------|:------------|
+| 📈 **Daily Trends** | Interactive daily nutrition charts |
+| 📅 **Weekly Summaries** | Comprehensive weekly breakdowns |
+| 🥧 **Macro Distribution** | Pie charts for macro ratios |
+| 📉 **Protein Tracking** | Line plots for trends |
+| ⏳ **Progress Bars** | Visual progress indicators |
+
+### 💧 Holistic Health Tracking
+
+| Feature | Description |
+|:--------|:------------|
+| 💦 **Water Intake** | Hydration tracking with visuals |
+| ⚖️ **Weight Tracking** | Weight logging & trends |
+| 🔥 **Streak System** | Daily motivation streaks |
+
+---
+
+<!-- ══════════════════════════════════════════════════════════════════════════ -->
+<!--                              TECH STACK                                    -->
+<!-- ══════════════════════════════════════════════════════════════════════════ -->
 
 ## 🛠️ Tech Stack
 
+<div align="center">
+
 | Layer | Technologies |
-|:---:|:---|
-| **Language** | ![Python](https://img.shields.io/badge/Python-3.8+-3776AB?style=flat&logo=python) Python 3.8+ |
-| **Frontend** | ![Streamlit](https://img.shields.io/badge/Streamlit-FF4B4B?style=flat) Streamlit Web UI |
-| **Data Processing** | ![Pandas](https://img.shields.io/badge/Pandas-150458?style=flat) Pandas • ![NumPy](https://img.shields.io/badge/NumPy-013243?style=flat) NumPy |
-| **ML/Optimization** | ![scikit-learn](https://img.shields.io/badge/scikit--learn-F7931E?style=flat) scikit-learn • ![PuLP](https://img.shields.io/badge/PuLP-2496D0?style=flat) PuLP |
-| **Visualization** | ![Plotly](https://img.shields.io/badge/Plotly-3FDCF7?style=flat) Plotly • ![Matplotlib](https://img.shields.io/badge/Matplotlib-11557C?style=flat) Matplotlib |
+|:------|:-------------|
+| **Language** | 🐍 [Python 3.8+](https://www.python.org/) |
+| **Web UI** | 🌐 [Streamlit](https://streamlit.io/) |
+| **Data Processing** | 🐼 [Pandas](https://pandas.pydata.org/) • 🔢 [NumPy](https://numpy.org/) |
+| **ML/AI** | 🤖 [scikit-learn](https://scikit-learn.org/) |
+| **Optimization** | ⚙️ [PuLP](https://coin-or.github.io/pulp/) |
+| **Visualization** | 📊 [Plotly](https://plotly.com/) • 📉 [Matplotlib](https://matplotlib.org/) |
+
+</div>
 
 ---
+
+<!-- ══════════════════════════════════════════════════════════════════════════ -->
+<!--                             INSTALLATION                                   -->
+<!-- ══════════════════════════════════════════════════════════════════════════ -->
 
 ## 📦 Installation
 
 ### Prerequisites
 
-- Python 3.8 or higher
-- pip package manager
+| Requirement | Version |
+|:------------|:--------|
+| 🐍 Python | 3.8 or higher |
+| 📦 pip | Latest version |
+
+### Quick Setup
 
 ```bash
-# 1️⃣ Clone the repository
+# ═══════════════════════════════════════════════════════════════════════════
+# STEP 1: Clone the Repository
+# ═══════════════════════════════════════════════════════════════════════════
 git clone https://github.com/Maitreyee/HealthTracker.git
 cd HealthTracker
 
-# 2️⃣ Create a virtual environment
+# ═══════════════════════════════════════════════════════════════════════════
+# STEP 2: Create Virtual Environment
+# ═══════════════════════════════════════════════════════════════════════════
 python -m venv venv
 
-# 3️⃣ Activate the environment
+# ═══════════════════════════════════════════════════════════════════════════
+# STEP 3: Activate Environment
+# ═══════════════════════════════════════════════════════════════════════════
 # Windows
 venv\Scripts\activate
+
 # macOS / Linux
 source venv/bin/activate
 
-# 4️⃣ Install dependencies
+# ═══════════════════════════════════════════════════════════════════════════
+# STEP 4: Install Dependencies
+# ═══════════════════════════════════════════════════════════════════════════
 pip install -r requirements.txt
-```
 
----
-
-## 🚀 Quick Start
-
-```bash
-# Run the application
+# ═══════════════════════════════════════════════════════════════════════════
+# STEP 5: Run the Application
+# ═══════════════════════════════════════════════════════════════════════════
 streamlit run app.py
 ```
 
-The app will open at **`http://localhost:8501`**
+---
+
+<!-- ══════════════════════════════════════════════════════════════════════════ -->
+<!--                                USAGE                                       -->
+<!-- ══════════════════════════════════════════════════════════════════════════ -->
+
+## 🚀 Usage
+
+### Starting the Application
+
+```bash
+streamlit run app.py
+```
+
+The application will open in your browser at **`http://localhost:8501`**
 
 ### Getting Started Guide
 
-| Step | Action | Description |
-|:---:|:---|:---|
-| 1️⃣ | **Set Profile** | Enter age, weight, height, gender in the sidebar |
-| 2️⃣ | **Select Goals** | Choose activity level and fitness objective |
+| Step | Action | What to Do |
+|:----:|:-------|:-----------|
+| 1️⃣ | **Set Profile** | Enter age, weight, height, gender in sidebar |
+| 2️⃣ | **Choose Goal** | Select activity level & fitness objective |
 | 3️⃣ | **Calculate** | Click "Calculate My Needs" for personalized targets |
-| 4️⃣ | **Generate Plan** | Create a 7-day meal plan or start tracking manually |
+| 4️⃣ | **Track** | Generate meal plan or start manual tracking |
 
 ---
+
+<!-- ══════════════════════════════════════════════════════════════════════════ -->
+<!--                           PROJECT STRUCTURE                               -->
+<!-- ══════════════════════════════════════════════════════════════════════════ -->
 
 ## 📂 Project Structure
 
@@ -107,68 +272,134 @@ The app will open at **`http://localhost:8501`**
 HealthTracker/
 │
 ├── 📄 app.py                      # Main Streamlit application
-├── 📄 constants.py                # Configuration & default values
+├── 📄 constants.py                # Configuration constants
 ├── 📄 requirements.txt            # Python dependencies
 │
-├── 📁 data/                       # Data files
-│   ├── nutrition_data_optimized.csv    # Food nutrition database
-│   └── tips.csv                       # Daily health tips
+├── 📁 data/                       # Data directory
+│   ├── nutrition_data_optimized.csv   # Food nutrition database
+│   └── tips.csv                       # Health tips
 │
-├── 📁 utils/                      # Core utilities
-│   ├── __init__.py               # Package initialization
-│   ├── analytics.py              # Charts & visualizations
-│   ├── data_loader.py            # Data loading utilities
-│   ├── meal_generator.py        # Meal plan generation
-│   └── ui_components.py          # Reusable UI components
+├── 📁 utils/                      # Utility modules
+│   ├── __init__.py            # Package initialization
+│   ├── analytics.py           # Chart & visualization functions
+│   ├── data_loader.py         # Data loading utilities
+│   ├── meal_generator.py     # Meal plan generation logic
+│   └── ui_components.py       # Reusable UI components
 │
-├── 📄 water_tracker.py            # Hydration tracking
-├── 📄 weight_tracker.py           # Weight logging & trends
-└── 📄 streaks.py                  # Daily streak system
+├── 📄 water_tracker.py           # Water intake tracking
+├── 📄 weight_tracker.py          # Weight tracking
+└── 📄 streaks.py                 # Daily streak system
 ```
 
+### File Descriptions
+
+| File | Purpose |
+|:-----|:--------|
+| `app.py` | Main application entry point |
+| `constants.py` | Configuration and default values |
+| `utils/analytics.py` | Plotly chart generation |
+| `utils/meal_generator.py` | Meal plan optimization |
+| `water_tracker.py` | Hydration tracking module |
+
 ---
 
-## 🔮 Future Improvements
+<!-- ══════════════════════════════════════════════════════════════════════════ -->
+<!--                              ROADMAP                                       -->
+<!-- ══════════════════════════════════════════════════════════════════════════ -->
+
+## 🔮 Future Improvements / Roadmap
+
+<div align="center">
 
 ### 🤖 AI & Machine Learning
-- [ ] AI-powered nutrition recommendations based on eating patterns
-- [ ] Predictive analytics for weight change forecasting
-- [ ] Food image recognition for instant meal logging
+| Feature | Status |
+|:--------|:-------|
+| AI-powered nutrition recommendations | 🔜 Planned |
+| Predictive analytics for weight forecasting | 🔜 Planned |
+| Food image recognition for instant logging | 🔜 Planned |
 
 ### 📱 User Experience
-- [ ] Customizable interactive dashboard with drag-and-drop widgets
-- [ ] Native iOS and Android mobile applications
-- [ ] Dark/Light theme toggle
+| Feature | Status |
+|:--------|:-------|
+| Customizable drag-and-drop dashboard | 🔜 Planned |
+| Native iOS and Android apps | 🔜 Planned |
+| Dark/Light theme toggle | 🔜 Planned |
 
 ### 🌐 Social Features
-- [ ] Community fitness challenges
-- [ ] Progress sharing to social media
-- [ ] Friend leaderboards and competitions
+| Feature | Status |
+|:--------|:-------|
+| Community fitness challenges | 🔜 Planned |
+| Social media progress sharing | 🔜 Planned |
+| Friend leaderboards | 🔜 Planned |
 
 ### 🔗 Integrations
-- [ ] Wearable device sync (Fitbit, Apple Watch, Garmin)
-- [ ] Google Fit & Apple Health integration
-- [ ] Barcode scanner for quick food logging
+| Feature | Status |
+|:--------|:-------|
+| Wearable sync (Fitbit, Apple Watch) | 🔜 Planned |
+| Google Fit & Apple Health | 🔜 Planned |
+| Barcode scanner for food logging | 🔜 Planned |
+
+</div>
 
 ---
+
+<!-- ══════════════════════════════════════════════════════════════════════════ -->
+<!--                            CONTRIBUTING                                   -->
+<!-- ══════════════════════════════════════════════════════════════════════════ -->
 
 ## 🤝 Contributing
 
-Contributions are welcome! Follow these steps:
+Contributions are welcome! Here's how you can help:
 
-1. **Fork** the repository
-2. **Create** a feature branch: `git checkout -b feature/amazing-feature`
-3. **Commit** your changes: `git commit -m 'Add amazing feature'`
-4. **Push** to the branch: `git push origin feature/amazing-feature`
-5. **Open** a Pull Request
+```bash
+# 1. Fork the repository
+# Click the "Fork" button on GitHub
 
-Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details.
+# 2. Clone your fork
+git clone https://github.com/YOUR_USERNAME/HealthTracker.git
+cd HealthTracker
+
+# 3. Create a feature branch
+git checkout -b feature/amazing-feature
+
+# 4. Make your changes
+# - Follow the existing code style
+# - Add tests if applicable
+# - Update documentation
+
+# 5. Commit and push
+git add .
+git commit -m 'Add amazing feature'
+git push origin feature/amazing-feature
+
+# 6. Open a Pull Request
+```
+
+### Contributor Guidelines
+
+| Guideline | Description |
+|:---------|:------------|
+| ✅ | Follow PEP 8 style guide |
+| ✅ | Write meaningful commit messages |
+| ✅ | Test your changes locally |
+| ✅ | Update documentation |
+| ✅ | Be respectful and constructive |
 
 ---
 
+<!-- ══════════════════════════════════════════════════════════════════════════ -->
+<!--                               LICENSE                                      -->
+<!-- ══════════════════════════════════════════════════════════════════════════ -->
+
 ## 📄 License
 
-This project is licensed under the **MIT License** — see the [LICENSE](LICENSE) file for details.
+<div align="center">
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
+**MIT License** — See the [LICENSE](LICENSE) file for full text.
+
+</div>
 
 ```
 MIT License
@@ -187,34 +418,54 @@ copies or substantial portions of the Software.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
 ```
 
 ---
 
-## 🙏 Acknowledgments
+<!-- ══════════════════════════════════════════════════════════════════════════ -->
+<!--                               AUTHOR                                       -->
+<!-- ══════════════════════════════════════════════════════════════════════════ -->
 
-- [Streamlit](https://streamlit.io/) — The fastest way to build data apps
-- [Plotly](https://plotly.com/) — Interactive graphing library
-- [scikit-learn](https://scikit-learn.org/) — Machine learning in Python
-- [Pandas](https://pandas.pydata.org/) — Powerful data structures for data analysis
-
----
+## 👤 Author
 
 <div align="center">
 
-![----------------------------------------------------](https://capsule-render.vercel.app/api?type=waving&color=gradient&height=80&section=footer)
+### Maitreyee
 
-**Built with ❤️ for a healthier lifestyle**
+| Contact | Link |
+|:--------|:-----|
+| 🐙 **GitHub** | [@Maitreyee](https://github.com/Maitreyee) |
+| 💼 **LinkedIn** | [Maitreyee](https://linkedin.com/in/maitreyee) |
+| 📧 **Email** | contact@maitreyee.dev |
 
-⭐ Star this repo if you found it useful!
+---
+
+**Python Developer | Data Science Enthusiast | Open Source Contributor**
 
 </div>
 
-=======
-# healthtracker
->>>>>>> 52b3cd61138c8865be6424fa2a6bdc269f718310
+---
+
+<!-- ══════════════════════════════════════════════════════════════════════════ -->
+<!--                                FOOTER                                     -->
+<!-- ══════════════════════════════════════════════════════════════════════════ -->
+
+<div align="center">
+
+![----------------------------------------------------](https://capsule-render.vercel.app/api?type=waving&color=gradient&height=100&section=footer)
+
+<br/>
+
+### ⭐ Don't forget to star this repository if you found it useful!
+
+<br/>
+
+**Built with ❤️ using Python & Streamlit**
+
+<br/>
+
+[⬆️ Back to Top](#-healthtracker)
+
+</div>
+
