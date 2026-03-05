@@ -23,6 +23,7 @@
 <!-- ══════════════════════════════════════════════════════════════════════════ -->
 
 <br/>
+
 # 🏃‍♂️ HealthTracker
 
 ### Your Personal AI-Powered Health & Nutrition Companion
