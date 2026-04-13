@@ -1,0 +1,22 @@
+# Dependencies
+node_modules/
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+.env
+
+# IDE
+.DS_Store
+.vscode/
+.idea/
+
+# Data (optional, but good practice for CSVs)
+data/*.csv  # Keep structure, ignore data files if sensitive
+
