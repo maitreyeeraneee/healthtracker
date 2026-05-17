@@ -1,12 +1,41 @@
+import os
 import pandas as pd
 import ast
 from typing import Dict, List, Tuple, Optional, Any
 
 def load_db():
-    """Load nutrition database."""
-    nutrition_df = pd.read_csv('data/nutrition_data_optimized.csv', index_col='food')
-    nutrition_df['unit_options'] = nutrition_df['unit_options'].apply(ast.literal_eval)
+    """Load nutrition database.
+
+    Adds validation so the app fails gracefully when the CSV is empty/corrupted.
+    """
+    csv_path = 'data/nutrition_data_optimized.csv'
+
+    if not os.path.exists(csv_path):
+        raise FileNotFoundError(f"Nutrition database not found at: {csv_path}")
+
+    if os.path.getsize(csv_path) <= 0:
+        # Let app.py catch and show a clean error.
+        raise ValueError(f"Nutrition database CSV is empty: {csv_path}")
+
+    # Load with expected columns.
+    try:
+        nutrition_df = pd.read_csv(csv_path, index_col='food')
+    except pd.errors.EmptyDataError as e:
+        raise ValueError(f"Nutrition database CSV has no parsable columns: {csv_path}") from e
+
+    if nutrition_df is None or nutrition_df.shape[0] == 0 or nutrition_df.shape[1] == 0:
+        raise ValueError(f"Nutrition database CSV parsed but contains no data: {csv_path}")
+
+    # Validate required columns exist.
+    required_cols = {'unit_options', 'kcal', 'protein', 'carbs', 'fat'}
+    missing = required_cols - set(nutrition_df.columns)
+    if missing:
+        raise ValueError(f"Nutrition database is missing columns: {sorted(missing)}")
+
+    # Parse unit_options safely.
+    nutrition_df['unit_options'] = nutrition_df['unit_options'].apply(lambda x: ast.literal_eval(x) if isinstance(x, str) else x)
     return nutrition_df
+
 
 def search_food_case_insensitive(food_name, nutrition_df):
     """

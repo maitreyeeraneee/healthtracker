@@ -30,15 +30,29 @@ def weight_tracker_tab():
         st.subheader("Log Weight")
 
         # Weight input
-        weight = st.number_input("Weight (kg)", min_value=30.0, max_value=200.0, value=st.session_state.get('current_weight', 70.0))
-        date = st.date_input("Date", datetime.now().date())
+        weight = st.number_input(
+            "Weight (kg)",
+            min_value=30.0,
+            max_value=200.0,
+            value=st.session_state.get('current_weight', 70.0),
+            key="weight_input_tracker",
+        )
+        date = st.date_input("Date", datetime.now().date(), key="weight_date_tracker")
+
 
         if st.button("Log Weight"):
             log_weight(weight, date)
 
         # Set target weight
         st.subheader("Set Target Weight")
-        target_weight = st.number_input("Target Weight (kg)", min_value=30.0, max_value=200.0, value=st.session_state.get('target_weight', st.session_state.ideal_weight))
+        target_weight = st.number_input(
+            "Target Weight (kg)",
+            min_value=30.0,
+            max_value=200.0,
+            value=st.session_state.get('target_weight', st.session_state.ideal_weight),
+            key="target_weight_input_tracker",
+        )
+
         if st.button("Set Target"):
             st.session_state.target_weight = target_weight
             st.success(f"Target weight set to {target_weight} kg")

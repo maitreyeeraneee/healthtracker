@@ -45,9 +45,10 @@ def load_data():
 
     try:
         nutrition_df = load_db()
-    except FileNotFoundError:
-        st.error("Nutrition database not found. Please ensure 'data/nutrition_data_optimized.csv' exists.")
+    except (FileNotFoundError, ValueError) as e:
+        st.error(str(e))
         nutrition_df = pd.DataFrame()
+
 
     try:
         tips_df = pd.read_csv('data/tips.csv')
@@ -257,9 +258,42 @@ from weight_tracker import weight_tracker_tab
 from streaks import streaks_tab
 
 # Main content
-tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs(["BMI & Daily Calorie Needs", "Meal Plan Generator", "Health Metrics", "Meal Tracking", "Water", "Weight", "Streaks"])
 
-with tab1:
+tab_labels = ["BMI & Daily Calorie Needs", "Meal Plan Generator", "Health Metrics", "Meal Tracking", "Water", "Weight", "Streaks"]
+# Persist active tab across refreshes using query params + session_state.
+if 'active_tab' not in st.session_state:
+    st.session_state.active_tab = 1
+
+query = st.query_params
+if 'tab' in query:
+    try:
+        st.session_state.active_tab = int(query.get('tab')[0])
+    except Exception:
+        pass
+
+
+# Clamp
+st.session_state.active_tab = max(0, min(st.session_state.active_tab, len(tab_labels) - 1))
+
+# Create tabs
+# Note: Streamlit re-renders the script; tabs themselves are safe, but selection state may reset.
+# We set st.session_state.active_tab using query params so the script can restore the same tab.
+tabs = st.tabs(tab_labels)
+active_tab_idx = st.session_state.active_tab
+
+# Ensure query params stay in sync with the session state so refresh preserves the selected tab.
+try:
+    st.query_params['tab'] = str(active_tab_idx)
+except Exception:
+    pass
+
+
+# Map to original variable names to avoid changing UI logic.
+(tab1, tab2, tab3, tab4, tab5, tab6, tab7) = tabs
+
+# Only run content for the active tab.
+if active_tab_idx == 0:
+
     st.header("Meals")
 
     # BMI & Calorie Needs Section
@@ -393,7 +427,8 @@ with tab2:
                         </div>
                         """, unsafe_allow_html=True)
 
-                        for meal in meals_of_type:
+                        for i, meal in enumerate(meals_of_type):
+
                             # Generate smart swaps for this food
                             smart_swaps = generate_smart_swaps(meal['Food'], nutrition_df)
 
@@ -410,7 +445,12 @@ with tab2:
                                 """, unsafe_allow_html=True)
                             with col2:
                                 if smart_swaps:
-                                    if st.button("🔄", key=f"swap_{meal['Food']}_{day_key}_{meal_type}"):
+                                    # Use loop index via enumerate to guarantee unique keys even when food names repeat
+                                    if st.button(
+                                        "🔄",
+                                        key=f"swap_{day_key}_{meal_type}_{i}_{meal['Food']}",
+                                    ):
+
                                         import random
                                         swap_food_dict = random.choice(smart_swaps)
                                         swap_food_name = swap_food_dict['food']
