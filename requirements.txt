@@ -5,3 +5,6 @@ scikit-learn
 pulp
 matplotlib
 plotly
+google-generativeai
+python-dotenv
+

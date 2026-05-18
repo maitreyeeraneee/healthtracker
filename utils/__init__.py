@@ -23,8 +23,15 @@ from .ui_components import (
     create_daily_calorie_bar_chart, create_meal_wise_macro_bar_chart
 )
 
+# From gemini_food_recognition.py
+from .gemini_food_recognition import (
+    detect_food_from_image,
+    DetectedFoodResult,
+)
+
 # From utils.py (analytics functions)
 from .analytics import (
+
     calculate_ideal_body_weight, calculate_body_fat_percentage,
     calculate_lean_body_mass, calculate_protein_target,
     calculate_daily_water_intake, calculate_calorie_balance,
@@ -39,6 +46,9 @@ __all__ = [
     'get_meal_totals', 'get_progress_towards_targets',
     'aggregate_historical_data', 'aggregate_meal_wise_data',
     'get_smart_units',
+
+    # gemini food recognition
+    'detect_food_from_image', 'DetectedFoodResult',
 
     # meal_generator functions
     'calculate_bmr_tdee', 'calculate_macros', 'filter_foods_by_preferences',
