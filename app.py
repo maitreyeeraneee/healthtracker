@@ -460,8 +460,8 @@ with tab2:
 
                         for i, meal in enumerate(meals_of_type):
 
-                            # Generate smart swaps for this food
-                            smart_swaps = generate_smart_swaps(meal['Food'], nutrition_df)
+                            # Generate smart swaps for this food (respect dietary preferences)
+                            smart_swaps = generate_smart_swaps(meal['Food'], nutrition_df, food_preference)
 
                             col1, col2 = st.columns([3, 1])
                             with col1:

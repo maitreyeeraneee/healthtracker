@@ -204,32 +204,43 @@ def filter_meals(df: pd.DataFrame, preferences: Dict[str, Any]) -> pd.DataFrame:
     # Filter by veg_flag
     veg_flag = preferences.get('veg_flag', 'none')
     if veg_flag == 'vegetarian':
-        # Exclude non-veg foods - use tags if available, else common exclusions
+        # Exclude non-veg foods (meat, fish, chicken, eggs, etc.)
         if 'tags' in filtered_df.columns:
-            non_veg_mask = filtered_df['tags'].astype(str).str.contains('non-veg|meat|fish|chicken|beef|pork', case=False, na=False)
+            non_veg_mask = filtered_df['tags'].astype(str).str.contains('non-veg|meat|fish|chicken|beef|pork|egg', case=False, na=False)
             filtered_df = filtered_df[~non_veg_mask]
         else:
-            non_veg_foods = [
-                'Chicken Breast', 'Salmon', 'Beef', 'Tuna', 'Turkey Breast',
-                'Duck Breast', 'Lamb', 'Pork Tenderloin', 'Shrimp', 'Lobster',
-                'Crab', 'Cod', 'Tilapia', 'Mahi Mahi', 'Swordfish', 'Mackerel',
-                'Sardines', 'Anchovies'
-            ]
-            filtered_df = filtered_df[~filtered_df.index.isin(non_veg_foods)]
+            # Use str.contains for keyword-based filtering to catch compound names like "Egg Curry - Mild"
+            idx_lower = filtered_df.index.astype(str).str.lower()
+            non_veg_keywords = ['chicken', 'meat', 'fish', 'beef', 'pork', 'lamb', 'mutton',
+                                'tuna', 'salmon', 'shrimp', 'prawn', 'crab', 'lobster',
+                                'egg', 'boiled egg', 'omelette', 'egg white']
+            non_veg_mask = np.zeros(len(filtered_df), dtype=bool)
+            for kw in non_veg_keywords:
+                non_veg_mask |= idx_lower.str.contains(kw, na=False)
+            filtered_df = filtered_df[~non_veg_mask]
     elif veg_flag == 'vegan':
-        # Exclude animal products
+        # Exclude ALL animal-based foods including dairy, eggs, meat, fish, chicken
         if 'tags' in filtered_df.columns:
             animal_mask = filtered_df['tags'].astype(str).str.contains('dairy|egg|meat|fish|chicken|beef|pork|milk|yogurt|cheese', case=False, na=False)
             filtered_df = filtered_df[~animal_mask]
         else:
-            animal_foods = [
-                'Chicken Breast', 'Salmon', 'Beef', 'Tuna', 'Turkey Breast',
-                'Duck Breast', 'Lamb', 'Pork Tenderloin', 'Shrimp', 'Lobster',
-                'Crab', 'Cod', 'Tilapia', 'Mahi Mahi', 'Swordfish', 'Mackerel',
-                'Sardines', 'Anchovies', 'Egg', 'Milk', 'Greek Yogurt', 'Cheese',
-                'Butter', 'Yogurt', 'Cottage Cheese', 'Curd', 'Lassi', 'Paneer'
+            idx_lower = filtered_df.index.astype(str).str.lower()
+            vegan_exclude_keywords = [
+                # meat, fish, poultry
+                'chicken', 'meat', 'fish', 'beef', 'pork', 'lamb', 'mutton',
+                'tuna', 'salmon', 'shrimp', 'prawn', 'crab', 'lobster',
+                # eggs
+                'egg', 'boiled egg', 'omelette', 'egg white',
+                # dairy
+                'milk', 'curd', 'yogurt', 'greek yogurt', 'paneer', 'cheese',
+                'butter', 'buttermilk', 'lassi', 'whey', 'cottage cheese',
+                'paneer butter masala', 'palak paneer', 'matar paneer',
+                'kadai paneer', 'panner', 'mozzarella',
             ]
-            filtered_df = filtered_df[~filtered_df.index.isin(animal_foods)]
+            animal_mask = np.zeros(len(filtered_df), dtype=bool)
+            for kw in vegan_exclude_keywords:
+                animal_mask |= idx_lower.str.contains(kw, na=False)
+            filtered_df = filtered_df[~animal_mask]
 
     # Allowlist relaxed mode:
     # - Keep app flexible for large realistic database.
@@ -906,13 +917,15 @@ def filter_foods_by_preferences(nutrition_df, food_preference, allergies, cuisin
     }
     return filter_meals(nutrition_df, preferences)
 
-def generate_smart_swaps(original_meal, nutrition_df):
+def generate_smart_swaps(original_meal, nutrition_df, veg_flag='none'):
     """
     Generate smart food swap with calculated quantity to match original macros.
+    Respects dietary preferences (veg_flag) to avoid suggesting banned foods.
 
     Args:
-        original_meal: Dict with 'Food', 'Calories', 'Protein', etc.
+        original_meal: Dict with 'Food', 'Calories', 'Protein', etc. (or food name string)
         nutrition_df: Nutrition dataframe
+        veg_flag: 'none', 'vegetarian', or 'vegan' - restricts swap candidates
 
     Returns:
         List of dicts with 'food', 'amount', 'calories', 'protein', 'carbs', 'fat' for best swaps
@@ -949,6 +962,31 @@ def generate_smart_swaps(original_meal, nutrition_df):
             (nutrition_df['kcal'] <= target_calories * 1.2) &
             (nutrition_df.index != food)
         ]
+
+    if candidates.empty:
+        return []
+
+    # Filter candidates based on dietary preference
+    if veg_flag in ('vegetarian', 'vegan'):
+        idx_lower = candidates.index.astype(str).str.lower()
+        drop_mask = np.zeros(len(candidates), dtype=bool)
+        if veg_flag == 'vegetarian':
+            veg_exclude_keywords = ['chicken', 'meat', 'fish', 'beef', 'pork', 'lamb', 'mutton',
+                                    'tuna', 'salmon', 'shrimp', 'prawn', 'crab', 'lobster',
+                                    'egg', 'boiled egg', 'omelette', 'egg white']
+        else:  # vegan
+            veg_exclude_keywords = [
+                'chicken', 'meat', 'fish', 'beef', 'pork', 'lamb', 'mutton',
+                'tuna', 'salmon', 'shrimp', 'prawn', 'crab', 'lobster',
+                'egg', 'boiled egg', 'omelette', 'egg white',
+                'milk', 'curd', 'yogurt', 'greek yogurt', 'paneer', 'cheese',
+                'butter', 'buttermilk', 'lassi', 'whey', 'cottage cheese',
+                'paneer butter masala', 'palak paneer', 'matar paneer',
+                'kadai paneer', 'panner', 'mozzarella',
+            ]
+        for kw in veg_exclude_keywords:
+            drop_mask |= idx_lower.str.contains(kw, na=False)
+        candidates = candidates[~drop_mask]
 
     if candidates.empty:
         return []
