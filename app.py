@@ -442,10 +442,32 @@ with tab2:
             with weekly_col4:
                 st.metric("Total Fat", f"{weekly_totals['Fat']:.1f}g")
 
-            # Display each day
-            for day_key, day_meals in st.session_state.meal_plan.items():
-                day_num = day_key.split('_')[1]
-                st.markdown(f"### Day {day_num}")
+            # Day selector - dropdown to pick a single day (instead of showing all 7 vertically)
+            day_keys = list(st.session_state.meal_plan.keys())
+            day_labels = {k: f"Day {k.split('_')[1]}" for k in day_keys}
+            
+            if 'selected_day_idx' not in st.session_state:
+                st.session_state.selected_day_idx = 0
+            
+            selected_day_label = st.selectbox(
+                "Select Day",
+                options=[day_labels[k] for k in day_keys],
+                index=st.session_state.selected_day_idx,
+                key="day_selector"
+            )
+            
+            # Find the selected day key
+            selected_day_key = None
+            for idx, k in enumerate(day_keys):
+                if day_labels[k] == selected_day_label:
+                    selected_day_key = k
+                    st.session_state.selected_day_idx = idx
+                    break
+            
+            if selected_day_key:
+                day_meals = st.session_state.meal_plan[selected_day_key]
+                day_num = selected_day_key.split('_')[1]
+                st.markdown(f"### Day {day_num} Meals")
 
                 # Group meals by type
                 meal_types = ['Breakfast', 'Lunch', 'Dinner', 'Snack']
@@ -479,7 +501,7 @@ with tab2:
                                     # Use loop index via enumerate to guarantee unique keys even when food names repeat
                                     if st.button(
                                         "🔄",
-                                        key=f"swap_{day_key}_{meal_type}_{i}_{meal['Food']}",
+                                        key=f"swap_{selected_day_key}_{meal_type}_{i}_{meal['Food']}",
                                     ):
 
                                         import random
@@ -500,9 +522,9 @@ with tab2:
                                             new_nutrition = calculate_nutrition_per_serving(swap_food_name, quantity, unit, nutrition_df)
                                             new_display_amount, new_display_unit = get_display_amount_and_unit(swap_food_name, new_nutrition['Calories'] / (nutrition_df.loc[swap_food_name, 'kcal'] / 100), nutrition_df)
                                             # Find and replace the meal
-                                            for i, m in enumerate(st.session_state.meal_plan[day_key]):
+                                            for j, m in enumerate(st.session_state.meal_plan[selected_day_key]):
                                                 if m['Food'] == meal['Food'] and m['Meal'] == meal_type:
-                                                    st.session_state.meal_plan[day_key][i] = {
+                                                    st.session_state.meal_plan[selected_day_key][j] = {
                                                         'Food': swap_food_name,
                                                         'Amount': f"{new_display_amount} {new_display_unit}",
                                                         'Calories': new_nutrition['Calories'],
@@ -516,7 +538,7 @@ with tab2:
                                         except Exception as e:
                                             st.error(f"Error swapping food: {str(e)}")
 
-                # Display daily totals
+                # Display daily totals for selected day
                 day_totals = get_meal_totals(day_meals)
                 st.subheader(f"Day {day_num} Totals")
                 total_col1, total_col2, total_col3, total_col4 = st.columns(4)
@@ -529,8 +551,6 @@ with tab2:
                     st.metric("Carbs", f"{day_totals['Carbs']:.1f}g")
                 with total_col4:
                     st.metric("Fat", f"{day_totals['Fat']:.1f}g")
-
-                st.markdown("---")
 
             # Enhanced Visualizations
             st.header("📊 Meal Plan Analytics")

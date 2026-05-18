@@ -2,6 +2,7 @@ import pandas as pd
 
 import numpy as np
 import random
+import re
 from typing import Dict, List, Tuple, Optional, Any
 from .data_loader import get_display_amount_and_unit
 
@@ -170,6 +171,20 @@ def calculate_targets(user: Dict[str, Any]) -> Tuple[float, Dict[str, float]]:
 
     return daily_calories, macro_targets
 
+def _word_boundary_pattern(keyword: str) -> str:
+    """Convert a keyword to a regex pattern with word boundaries.
+    This prevents false positives like 'lassi' matching 'classic'.
+    For multi-word keywords, we build an appropriate pattern."""
+    kw = keyword.strip().lower()
+    # For multi-word keywords like "egg white", "paneer butter masala", etc.
+    if ' ' in kw:
+        words = kw.split()
+        # Pattern: each word with word boundaries, allowing spaces between
+        pattern = r'\b' + r'\s+'.join(r'\b' + re.escape(w) + r'\b' for w in words)
+        return pattern
+    return r'\b' + re.escape(kw) + r'\b'
+
+
 def filter_meals(df: pd.DataFrame, preferences: Dict[str, Any]) -> pd.DataFrame:
     """
     Filter meals based on user preferences.
@@ -196,7 +211,8 @@ def filter_meals(df: pd.DataFrame, preferences: Dict[str, Any]) -> pd.DataFrame:
         idx_lower = filtered_df.index.astype(str).str.lower()
         ban_mask = np.zeros(len(filtered_df), dtype=bool)
         for b in INDIAN_EXOTIC_HARDBAN:
-            ban_mask |= idx_lower.str.contains(b, na=False)
+            pattern = _word_boundary_pattern(b)
+            ban_mask |= idx_lower.str.contains(pattern, na=False, regex=True)
         filtered_df = filtered_df[~ban_mask]
     except Exception:
         pass
@@ -209,14 +225,15 @@ def filter_meals(df: pd.DataFrame, preferences: Dict[str, Any]) -> pd.DataFrame:
             non_veg_mask = filtered_df['tags'].astype(str).str.contains('non-veg|meat|fish|chicken|beef|pork|egg', case=False, na=False)
             filtered_df = filtered_df[~non_veg_mask]
         else:
-            # Use str.contains for keyword-based filtering to catch compound names like "Egg Curry - Mild"
+            # Use word-boundary regex for keyword-based filtering to catch compound names like "Egg Curry - Mild"
             idx_lower = filtered_df.index.astype(str).str.lower()
             non_veg_keywords = ['chicken', 'meat', 'fish', 'beef', 'pork', 'lamb', 'mutton',
                                 'tuna', 'salmon', 'shrimp', 'prawn', 'crab', 'lobster',
                                 'egg', 'boiled egg', 'omelette', 'egg white']
             non_veg_mask = np.zeros(len(filtered_df), dtype=bool)
             for kw in non_veg_keywords:
-                non_veg_mask |= idx_lower.str.contains(kw, na=False)
+                pattern = _word_boundary_pattern(kw)
+                non_veg_mask |= idx_lower.str.contains(pattern, na=False, regex=True)
             filtered_df = filtered_df[~non_veg_mask]
     elif veg_flag == 'vegan':
         # Exclude ALL animal-based foods including dairy, eggs, meat, fish, chicken
@@ -239,7 +256,8 @@ def filter_meals(df: pd.DataFrame, preferences: Dict[str, Any]) -> pd.DataFrame:
             ]
             animal_mask = np.zeros(len(filtered_df), dtype=bool)
             for kw in vegan_exclude_keywords:
-                animal_mask |= idx_lower.str.contains(kw, na=False)
+                pattern = _word_boundary_pattern(kw)
+                animal_mask |= idx_lower.str.contains(pattern, na=False, regex=True)
             filtered_df = filtered_df[~animal_mask]
 
     # Allowlist relaxed mode:
@@ -985,7 +1003,8 @@ def generate_smart_swaps(original_meal, nutrition_df, veg_flag='none'):
                 'kadai paneer', 'panner', 'mozzarella',
             ]
         for kw in veg_exclude_keywords:
-            drop_mask |= idx_lower.str.contains(kw, na=False)
+            pattern = _word_boundary_pattern(kw)
+            drop_mask |= idx_lower.str.contains(pattern, na=False, regex=True)
         candidates = candidates[~drop_mask]
 
     if candidates.empty:
