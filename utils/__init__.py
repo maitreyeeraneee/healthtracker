@@ -5,7 +5,8 @@ from .data_loader import (
     load_db, search_food_case_insensitive, convert_units_to_grams,
     get_display_amount_and_unit, calculate_nutrition_per_serving,
     get_meal_totals, get_progress_towards_targets,
-    aggregate_historical_data, aggregate_meal_wise_data
+    aggregate_historical_data, aggregate_meal_wise_data,
+    get_smart_units
 )
 
 # From meal_generator.py
@@ -37,6 +38,7 @@ __all__ = [
     'get_display_amount_and_unit', 'calculate_nutrition_per_serving',
     'get_meal_totals', 'get_progress_towards_targets',
     'aggregate_historical_data', 'aggregate_meal_wise_data',
+    'get_smart_units',
 
     # meal_generator functions
     'calculate_bmr_tdee', 'calculate_macros', 'filter_foods_by_preferences',

@@ -87,7 +87,18 @@ INDIAN_EXOTIC_HARDBAN = {
     'salmon', 'anchovies', 'sardines', 'calamari', 'octopus',
 
     # Non-veg meats that are intentionally avoided by name-bans
-    'pork', 'beef', 'duck', 'lamb'
+    'pork', 'beef', 'duck', 'lamb',
+
+    # Ingredient-only / impractical foods to eat alone as a meal
+    'ginger', 'garlic', 'turmeric', 'cumin', 'coriander', 'cardamom',
+    'clove', 'cinnamon', 'nutmeg', 'saffron', 'mustard seeds',
+    'fenugreek', 'asafoetida', 'curry leaves', 'bay leaf',
+    'black pepper', 'red chili', 'green chili', 'chili powder',
+    'baking soda', 'baking powder', 'vinegar', 'soy sauce',
+    'tomato sauce', 'ketchup', 'mayonnaise', 'mustard',
+    'raw onion', 'raw tomato', 'raw potato', 'raw carrot',  # raw veggies as meals
+    'plain flour', 'maida', 'atta', 'wheat flour', 'rice flour',
+    'besan', 'gram flour', 'cornflour', 'corn starch',
 }
 
 
@@ -127,8 +138,20 @@ JUNK_MEAL_HARDBAN_KEYWORDS = {
 # Keep legacy constant name, but DO NOT enforce protein-shake-only output.
 GENERATOR_ONLY_PROTEIN_SHAKE = 'Protein Smoothie'
 
+# Max protein shakes allowed per day
+MAX_PROTEIN_SHAKES_PER_DAY = 1
+
+# Keywords that identify protein shakes
+PROTEIN_SHAKE_KEYWORDS = ['protein smoothie', 'protein shake', 'protein powder']
 
 
+def _is_protein_shake(food_name) -> bool:
+    """Check if a food name is a protein shake/smoothie."""
+    name = str(food_name or '').lower()
+    for kw in PROTEIN_SHAKE_KEYWORDS:
+        if kw in name:
+            return True
+    return False
 
 
 def calculate_targets(user: Dict[str, Any]) -> Tuple[float, Dict[str, float]]:
@@ -191,6 +214,7 @@ def filter_meals(df: pd.DataFrame, preferences: Dict[str, Any]) -> pd.DataFrame:
 
     Notes:
     - This function is the first line of defense to ensure we never pick exotic/unrealistic foods.
+    - Vegan filtering is comprehensive: excludes ALL animal products including dairy, eggs, whey.
     """
     filtered_df = df.copy()
 
@@ -236,9 +260,12 @@ def filter_meals(df: pd.DataFrame, preferences: Dict[str, Any]) -> pd.DataFrame:
                 non_veg_mask |= idx_lower.str.contains(pattern, na=False, regex=True)
             filtered_df = filtered_df[~non_veg_mask]
     elif veg_flag == 'vegan':
-        # Exclude ALL animal-based foods including dairy, eggs, meat, fish, chicken
+        # Exclude ALL animal-based foods including dairy, eggs, meat, fish, chicken, whey
         if 'tags' in filtered_df.columns:
-            animal_mask = filtered_df['tags'].astype(str).str.contains('dairy|egg|meat|fish|chicken|beef|pork|milk|yogurt|cheese', case=False, na=False)
+            animal_mask = filtered_df['tags'].astype(str).str.contains(
+                'dairy|egg|meat|fish|chicken|beef|pork|milk|yogurt|cheese|whey', 
+                case=False, na=False
+            )
             filtered_df = filtered_df[~animal_mask]
         else:
             idx_lower = filtered_df.index.astype(str).str.lower()
@@ -248,11 +275,13 @@ def filter_meals(df: pd.DataFrame, preferences: Dict[str, Any]) -> pd.DataFrame:
                 'tuna', 'salmon', 'shrimp', 'prawn', 'crab', 'lobster',
                 # eggs
                 'egg', 'boiled egg', 'omelette', 'egg white',
-                # dairy
+                # dairy - comprehensive list
                 'milk', 'curd', 'yogurt', 'greek yogurt', 'paneer', 'cheese',
                 'butter', 'buttermilk', 'lassi', 'whey', 'cottage cheese',
                 'paneer butter masala', 'palak paneer', 'matar paneer',
                 'kadai paneer', 'panner', 'mozzarella',
+                'dahi', 'yogurt drink', 'protein smoothie',
+                'chai', 'masala chai',  # chai typically has milk
             ]
             animal_mask = np.zeros(len(filtered_df), dtype=bool)
             for kw in vegan_exclude_keywords:
@@ -358,18 +387,9 @@ def score_and_rank(meal_row: pd.Series, user_targets: Dict[str, float]) -> float
 def pick_meal_for_slot(filtered_df: pd.DataFrame, slot_target_kcal: float,
                       used_foods: List[str], ban_list: List[str],
                       prefer_high_protein: bool = True,
-                      slot_target_protein_g: Optional[float] = None) -> List[Dict[str, Any]]:
+                      slot_target_protein_g: Optional[float] = None,
+                      protein_shakes_used_today: int = 0) -> List[Dict[str, Any]]:
     """Pick items for a slot and compose a *complete* meal."""
-
-    # NOTE: Original docstring was corrupted during earlier edits; keeping this minimal.
-    # Args:
-    #   filtered_df: Filtered nutrition dataframe
-    #   slot_target_kcal: Target calories for this slot (passed as tuple: (slot_name, target_kcal))
-    #   used_foods: Foods already used today
-    #   ban_list: Foods to ban (e.g., repeats from previous days)
-    #   prefer_high_protein: Whether to prefer high-protein foods
-    # Returns:
-    #   List of meal items with portions and macros
 
     # Unpack slot name and target calories
     if isinstance(slot_target_kcal, tuple):
@@ -407,13 +427,16 @@ def pick_meal_for_slot(filtered_df: pd.DataFrame, slot_target_kcal: float,
         junk_mask = np.zeros(len(available_df), dtype=bool)
         for kw in JUNK_MEAL_HARDBAN_KEYWORDS:
             junk_mask |= idx_lower.str.contains(kw, na=False)
-        # Also enforce only one protein shake option
         available_df = available_df[~junk_mask]
-        available_df = available_df[
-            ~((idx_lower.str.contains('protein powder|protein shake|protein smoothie', na=False)) &
-              (idx_lower.str.lower() != GENERATOR_ONLY_PROTEIN_SHAKE.lower()) &
-              (idx_lower.str.contains('protein powder|protein shake', na=False)))
-        ]
+
+        # Enforce protein shake limits: if already used up for the day, remove all protein shakes
+        # Also remove protein shakes from breakfast and snack slots (keep them for post-workout etc.)
+        if protein_shakes_used_today >= MAX_PROTEIN_SHAKES_PER_DAY:
+            # Remove all protein shakes from available
+            shake_mask = np.zeros(len(available_df), dtype=bool)
+            for sh_kw in PROTEIN_SHAKE_KEYWORDS:
+                shake_mask |= idx_lower.str.contains(sh_kw, na=False)
+            available_df = available_df[~shake_mask]
 
 
     if len(available_df) == 0:
@@ -429,9 +452,10 @@ def pick_meal_for_slot(filtered_df: pd.DataFrame, slot_target_kcal: float,
     }
 
 
-    # Allowlist relaxed mode: do not restrict candidates to a small allowlist.
-    # Scoring + slot constraints + health_score + hard-ban list handle realism.
-
+    # Add variety: shuffle order before scoring to avoid always picking the same top items
+    shuffled_indices = list(available_df.index)
+    random.shuffle(shuffled_indices)
+    available_df = available_df.loc[shuffled_indices]
 
     available_df = available_df.copy()
     available_df['score'] = available_df.apply(lambda row: score_and_rank(row, dummy_targets), axis=1)
@@ -451,8 +475,8 @@ def pick_meal_for_slot(filtered_df: pd.DataFrame, slot_target_kcal: float,
     else:
         preferred_sizes = [3, 4, 2, 5]
 
-    def _food_category_flags(food_name: str) -> Dict[str, bool]:
-        n = (food_name or '').lower()
+    def _food_category_flags(food_name) -> Dict[str, bool]:
+        n = str(food_name or '').lower()
         flags = {
             'carb': False,
             'protein': False,
@@ -508,8 +532,8 @@ def pick_meal_for_slot(filtered_df: pd.DataFrame, slot_target_kcal: float,
         if combo_size <= 0 or combo_size > len(available_df):
             continue
 
-        # Sample multiple combinations for this size
-        num_samples = min(120, max(25, len(available_df) * 2))
+        # Sample multiple combinations for this size - increased for better variety
+        num_samples = min(200, max(50, len(available_df) * 3))
         for _ in range(num_samples):
             # Note: sample without replacement; combo_size items.
             combination = available_df.sample(n=combo_size, replace=False)
@@ -520,7 +544,7 @@ def pick_meal_for_slot(filtered_df: pd.DataFrame, slot_target_kcal: float,
             for _, food_row in combination.iterrows():
                 portion_g = adjust_portion_to_hit_calories(food_row, target_kcal / combo_size)
                 nutrition = {
-                    'Food': food_row.name,
+                    'Food': str(food_row.name),
                     'Portion_g': portion_g,
                     'Calories': (portion_g / 100) * food_row['kcal'],
                     'Protein': (portion_g / 100) * food_row['protein'],
@@ -551,13 +575,13 @@ def pick_meal_for_slot(filtered_df: pd.DataFrame, slot_target_kcal: float,
     if not best_combination and len(available_df) > 0:
         fallback_size = 1 if slot_name.lower() == 'snack' else 2
         fallback_size = min(fallback_size, len(available_df))
-        top_items = available_df.head(min(5, len(available_df)))
+        top_items = available_df.head(min(10, len(available_df)))  # Increased from 5 for more variety
 
         for _, food_row in top_items.iterrows():
             # keep portion calc reasonable
             portion_g = adjust_portion_to_hit_calories(food_row, target_kcal / fallback_size)
             best_combination.append({
-                'Food': food_row.name,
+                'Food': str(food_row.name),
                 'Portion_g': portion_g,
                 'Calories': (portion_g / 100) * food_row['kcal'],
                 'Protein': (portion_g / 100) * food_row['protein'],
@@ -687,9 +711,9 @@ def _filter_by_slot_recipes(df: pd.DataFrame, slot: str) -> pd.DataFrame:
 
 
 def build_day(filtered_df: pd.DataFrame, daily_targets: Dict[str, float],
-              used_today: List[str], prev_day_items: List[str]) -> Dict[str, Any]:
+              used_today: List[str], prev_day_items: List[str],
+              day_index: int = 0) -> Dict[str, Any]:
     # Build a complete day's meal plan with timing rules + goal-aware protein distribution.
-    # (Docstring removed due to previous syntax corruption during edits.)
 
     day_plan: Dict[str, List[Dict[str, Any]]] = {}
     all_used_today = used_today.copy()
@@ -730,6 +754,9 @@ def build_day(filtered_df: pd.DataFrame, daily_targets: Dict[str, float],
 
     ban_list = prev_day_items if len(prev_day_items) > 0 else []
 
+    # Track protein shakes used across the day
+    protein_shakes_used_today = 0
+
     for slot in MEAL_SLOTS:
         slot_target_kcal = daily_calories * slot_distribution[slot]
         target_slot_protein_g = daily_protein_g * protein_slot_fractions.get(slot, 0.25)
@@ -747,6 +774,7 @@ def build_day(filtered_df: pd.DataFrame, daily_targets: Dict[str, float],
             ban_list,
             prefer_high_protein=prefer_high_protein,
             slot_target_protein_g=target_slot_protein_g,
+            protein_shakes_used_today=protein_shakes_used_today,
         )
 
 
@@ -769,6 +797,7 @@ def build_day(filtered_df: pd.DataFrame, daily_targets: Dict[str, float],
                     all_used_today,
                     ban_list,
                     prefer_high_protein=True,
+                    protein_shakes_used_today=protein_shakes_used_today,
                 )[:1]
 
         # If protein is far from slot target, try a protein-forward reroll.
@@ -780,9 +809,15 @@ def build_day(filtered_df: pd.DataFrame, daily_targets: Dict[str, float],
                 all_used_today,
                 ban_list,
                 prefer_high_protein=True,
+                protein_shakes_used_today=protein_shakes_used_today,
             )
             if reroll:
                 meal_items = reroll
+
+        # Count protein shakes used in this slot
+        for item in meal_items:
+            if _is_protein_shake(item['Food']):
+                protein_shakes_used_today += 1
 
         day_plan[slot] = meal_items
         for item in meal_items:
@@ -828,11 +863,17 @@ def build_week(filtered_df: pd.DataFrame, user_targets: Dict[str, float]) -> Dic
     week_plan = {}
     used_history = []  # Track foods used across days
     prev_day_items = []
+    # Track all protein shakes used in the week to avoid overuse
+    weekly_protein_shake_count = 0
 
     for day_idx in range(7):
         # Build day with variety constraints
-        day_result = build_day(filtered_df, user_targets, [], prev_day_items)
+        day_result = build_day(filtered_df, user_targets, [], prev_day_items, day_index=day_idx)
         week_plan[f'day_{day_idx + 1}'] = day_result['meals']
+
+        # Count protein shakes in this day
+        day_shakes = sum(1 for meal in day_result['meals'] if _is_protein_shake(meal['Food']))
+        weekly_protein_shake_count += day_shakes
 
         # Update history
         prev_day_items = [item['Food'] for item in day_result['meals']]
@@ -879,7 +920,11 @@ def adjust_portion_to_hit_calories(food_row: pd.Series, target_kcal: float) -> f
     portion_g = (target_kcal / calories_per_100g) * 100
 
     # Reasonable bounds - cap at 250g for realism
-    portion_g = max(20, min(portion_g, 250))
+    # For low-calorie foods like veggies, allow up to 300g
+    if calories_per_100g < 50:
+        portion_g = max(20, min(portion_g, 300))
+    else:
+        portion_g = max(20, min(portion_g, 250))
 
     return portion_g
 
@@ -1001,6 +1046,7 @@ def generate_smart_swaps(original_meal, nutrition_df, veg_flag='none'):
                 'butter', 'buttermilk', 'lassi', 'whey', 'cottage cheese',
                 'paneer butter masala', 'palak paneer', 'matar paneer',
                 'kadai paneer', 'panner', 'mozzarella',
+                'dahi', 'yogurt drink', 'protein smoothie',
             ]
         for kw in veg_exclude_keywords:
             pattern = _word_boundary_pattern(kw)
@@ -1010,10 +1056,10 @@ def generate_smart_swaps(original_meal, nutrition_df, veg_flag='none'):
     if candidates.empty:
         return []
 
-    # Pick the best candidates (highest protein density)
+    # Pick the best candidates (highest protein density) - return up to 5 for variety
     candidates = candidates.copy()
     candidates['protein_density'] = candidates['protein'] / candidates['kcal']
-    candidates = candidates.sort_values('protein_density', ascending=False).head(3)  # Top 3
+    candidates = candidates.sort_values('protein_density', ascending=False).head(5)  # Top 5 for more swap variety
 
     swaps = []
     for _, best_swap in candidates.iterrows():

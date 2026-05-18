@@ -107,6 +107,118 @@ def convert_units_to_grams(food_name, quantity, unit, nutrition_df):
         # Default to grams if unit not recognized
         return quantity
 
+# Mapping of food name keywords to logical display units
+_FOOD_UNIT_MAP = [
+    # Grains, rice, roti, chapati
+    (['rice', 'roti', 'chapati', 'poha', 'upma', 'dosa', 'idli', 'khichdi',
+      'oats', 'oatmeal', 'pasta', 'noodles', 'quinoa', 'dal', 'dal tadka',
+      'dal fry', 'moong dal', 'masoor dal', 'chana masala', 'chole', 'rajma',
+      'biryani', 'veg biryani', 'pulav', 'curd rice', 'jeera rice', 'brown rice',
+      'basmati rice', 'fried rice', 'pongal', 'sevai', 'vermicelli',
+      'upma', 'semiya'],
+     ['bowl', 'cup', 'grams']),
+
+    # Sabzi, vegetable dishes
+    (['sabzi', 'aloo gobi', 'bhindi', 'baingan', 'mixed vegetable',
+      'vegetable curry', 'palak', 'saag', 'tikki', 'paneer', 'paneer butter masala',
+      'palak paneer', 'matar paneer', 'kadai paneer', 'paneer tikka',
+      'chana', 'chickpeas', 'rajma', 'soya', 'tofu', 'tempeh', 'seitan'],
+     ['bowl', 'grams']),
+
+    # Dal (lentils) - also bowl/grams as a category
+    (['dal', 'lentil', 'sambar', 'rasam'],
+     ['bowl', 'cup', 'grams']),
+
+    # Milk and liquid dairy
+    (['milk', 'skim milk', 'buttermilk', 'lassi', 'yogurt drink', 'protein smoothie',
+      'smoothie', 'fruit smoothie', 'protein shake', 'green tea', 'masala chai',
+      'tea', 'coffee', 'lemon water', 'water'],
+     ['glass', 'ml', 'cup']),
+
+    # Curd, yogurt, dahi
+    (['curd', 'dahi', 'yogurt', 'greek yogurt', 'low-fat curd', 'low-fat yogurt'],
+     ['bowl', 'cup', 'grams']),
+
+    # Peanut butter, nut butters
+    (['peanut butter', 'almond butter', 'cashew butter'],
+     ['tbsp', 'grams']),
+
+    # Oils, ghee
+    (['oil', 'ghee', 'butter', 'coconut oil', 'olive oil', 'mustard oil',
+      'sesame oil', 'groundnut oil', 'almond oil'],
+     ['tsp', 'tbsp', 'ml']),
+
+    # Fruits
+    (['apple', 'banana', 'orange', 'mango', 'papaya', 'guava', 'pomegranate',
+      'kiwi', 'coconut', 'watermelon', 'grapes', 'dates', 'strawberries',
+      'blueberries', 'litchi', 'pear', 'pineapple', 'jackfruit', 'jamun',
+      'custard apple', 'sapota', 'fig'],
+     ['pieces', 'grams']),
+
+    # Eggs
+    (['egg', 'omelette', 'egg white', 'boiled egg', 'egg whites'],
+     ['pieces', 'grams']),
+
+    # Nuts and seeds
+    (['nuts', 'almonds', 'walnuts', 'peanuts', 'cashews', 'pistachio',
+      'chia seeds', 'flax seeds', 'seeds', 'pumpkin seeds', 'sunflower seeds'],
+     ['grams', 'tbsp']),
+
+    # Bread
+    (['bread', 'brown bread', 'white bread', 'multigrain bread'],
+     ['slice', 'grams']),
+
+    # Chicken, meat, fish
+    (['chicken', 'chicken breast', 'chicken tikka', 'mutton', 'fish', 'meat',
+      'tuna', 'salmon', 'prawn', 'shrimp'],
+     ['pieces', 'grams']),
+
+    # Sprouts
+    (['sprouts', 'roasted chana', 'chana', 'mixed sprouts'],
+     ['bowl', 'cup', 'grams']),
+
+    # Snacks
+    (['dhokla', 'misal', 'bhel', 'sandwich', 'wrap', 'roll'],
+     ['pieces', 'grams']),
+]
+
+
+def _get_food_keywords(food_name: str) -> set:
+    """Get the set of keywords to match for a food name."""
+    name = food_name.lower().strip()
+    # Use the full name and also individual words for matching
+    words = set(name.split())
+    words.add(name)
+    return words
+
+
+def get_smart_units(food_name: str, unit_options_from_db: list = None) -> list:
+    """
+    Return logical display units for a given food name based on its type.
+    Falls back to unit_options from the database, then to ['grams'].
+    """
+    name_lower = food_name.lower().strip()
+    name_keywords = _get_food_keywords(name_lower)
+
+    for keywords, units in _FOOD_UNIT_MAP:
+        for kw in keywords:
+            if kw in name_lower or any(kw == wk for wk in name_keywords if len(kw) > 2):
+                # Check for partial word match too
+                for nkw in name_keywords:
+                    if kw in nkw or nkw in kw:
+                        return units
+
+    # Fallback: use database unit_options but filter to reasonable ones
+    if unit_options_from_db:
+        priority = ['grams', 'g', 'cup', 'piece', 'pieces', 'bowl', 'tbsp', 'tsp', 'glass', 'ml', 'slice']
+        filtered = [u for u in priority if u in unit_options_from_db]
+        if filtered:
+            return filtered
+        return list(unit_options_from_db)
+
+    return ['grams']
+
+
 def get_display_amount_and_unit(food_name, grams, nutrition_df):
     """
     Convert grams back to a user-friendly display unit and quantity.

@@ -630,8 +630,28 @@ with tab4:
         # Quantity input
         quantity = st.number_input("Quantity", min_value=0.1, value=1.0)
 
-        # Unit selector
-        unit_options = ["grams", "cups", "pieces", "fruit sizes", "sabzi types"]
+        # Smart unit selector based on selected food
+        if selected_food:
+            from utils import get_smart_units
+            smart_units = get_smart_units(selected_food)
+            # Map internal unit names to display names
+            unit_display_map = {
+                'grams': 'grams', 'g': 'grams', 'cup': 'cups', 'cups': 'cups',
+                'piece': 'pieces', 'pieces': 'pieces',
+                'tbsp': 'tbsp', 'tsp': 'tsp',
+                'bowl': 'bowls', 'glass': 'glass', 'ml': 'ml', 'slice': 'slice'
+            }
+            unit_options = list(dict.fromkeys([unit_display_map.get(u, u) for u in smart_units]))
+            # Deduplicate while preserving order
+            seen = set()
+            unit_options_deduped = []
+            for u in unit_options:
+                if u not in seen:
+                    seen.add(u)
+                    unit_options_deduped.append(u)
+            unit_options = unit_options_deduped
+        else:
+            unit_options = ["grams", "cups", "pieces"]
         unit = st.selectbox("Unit", unit_options)
 
         if st.button("Add to Meal"):
