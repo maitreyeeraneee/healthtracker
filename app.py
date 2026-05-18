@@ -324,10 +324,8 @@ except Exception:
 # Map to original variable names to avoid changing UI logic.
 (tab1, tab2, tab3, tab4, tab5, tab6, tab7) = tabs
 
-# Only run content for the active tab.
-if active_tab_idx == 0:
-
-    st.header("Meals")
+# Use Streamlit tab context managers (not active_tab_idx conditionals)
+with tab1:
 
     # BMI & Calorie Needs Section
     st.subheader("BMI & Daily Calorie Needs")
