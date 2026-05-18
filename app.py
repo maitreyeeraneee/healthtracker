@@ -301,6 +301,7 @@ tab_labels = [
     "Meal Plan Generator",
     "Health Metrics",
     "Meal Tracking",
+    "Insights",
     "Water",
     "Weight",
     "Streaks",
@@ -310,6 +311,7 @@ tab_labels = [
 # Persist active tab across refreshes using query params + session_state.
 if 'active_tab' not in st.session_state:
     st.session_state.active_tab = 1
+
 
 query = st.query_params
 if 'tab' in query:
@@ -328,6 +330,7 @@ st.session_state.active_tab = max(0, min(st.session_state.active_tab, len(tab_la
 tabs = st.tabs(tab_labels)
 active_tab_idx = st.session_state.active_tab
 
+
 # Ensure query params stay in sync with the session state so refresh preserves the selected tab.
 try:
     st.query_params['tab'] = str(active_tab_idx)
@@ -336,12 +339,15 @@ except Exception:
 
 
 # Map to original variable names to avoid changing UI logic.
-(tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8, tab9) = tabs
+(tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8, tab9, tab10) = tabs
 
-
+# New tab mapping (inserted after Meal Tracking):
+# tab5 => Insights, tab6 => Water, tab7 => Weight, tab8 => Streaks, tab9 => Assistant, tab10 => Smart Swap
 
 # Use Streamlit tab context managers (not active_tab_idx conditionals)
 with tab1:
+
+
 
     # BMI & Calorie Needs Section
     st.subheader("BMI & Daily Calorie Needs")
@@ -635,6 +641,7 @@ with tab4:
     # Date picker
     selected_date = st.date_input("Select Date", datetime.now().date())
 
+
     # Meal type selector
     meal_type = st.selectbox("Meal Type", ["Breakfast", "Lunch", "Dinner", "Snack"])
 
@@ -748,9 +755,47 @@ with tab4:
     else:
         st.info("No meals logged for this date.")
 
+    # Nutrient Intelligence (inside Meal Tracker)
+    if selected_date.strftime('%Y-%m-%d') in st.session_state.daily_log and st.session_state.metrics_calculated:
+        from utils.nutrient_intelligence import analyze_meal_day
+
+        meals_selected = st.session_state.daily_log.get(selected_date.strftime('%Y-%m-%d'), [])
+        # derive protein target from current session
+        protein_target = st.session_state.get('protein_g', 0)
+        fiber_target = 25.0
+        iron_target = 18.0
+        calcium_target = 1000.0
+
+        ni = analyze_meal_day(
+            meals=meals_selected,
+            nutrition_df=nutrition_df,
+            protein_target=protein_target,
+            fiber_target=fiber_target,
+            iron_target=iron_target,
+            calcium_target=calcium_target,
+        )
+
+        if ni.get('smart_insights'):
+            st.subheader("Smart Insights")
+            for msg in ni['smart_insights'][:4]:
+                st.info(msg)
+
+        if ni.get('recommendations'):
+            st.subheader("Auto-correct suggestions")
+            for rec in ni['recommendations'][:3]:
+                header = f"{rec.get('source')} → {rec.get('target')}"
+                st.markdown(
+                    f"""<div class="meal-item"><strong>{header}</strong>"""
+                    f"""<div style="color:#374151;margin-top:6px;font-size:0.92em;">"""
+                    + "<br/>".join([f"- {r}" for r in (rec.get('reasons') or [])[:3]])
+                    + "</div></div>",
+                    unsafe_allow_html=True,
+                )
+
     # Analytics section
     if st.session_state.daily_log:
         st.header("Analytics")
+
 
         # Aggregate data
         historical_data = aggregate_historical_data(st.session_state.daily_log)
@@ -780,21 +825,56 @@ with tab4:
                 st.plotly_chart(meal_wise_chart, use_container_width=True)
 
 with tab5:
-    water_tracker_tab()
+    from utils.insights import build_insights
+
+    st.header("Insights")
+    if not st.session_state.daily_log:
+        st.info("Log meals to unlock insights.")
+    else:
+        # Uses only meal logs (current app stores date-level logs). Weight/workout logs are optional.
+        insights = build_insights(
+            daily_log=st.session_state.daily_log,
+            targets=None,
+            weight_log=st.session_state.get("weight_log"),
+            workout_log=st.session_state.get("workout_log"),
+        )
+
+
+        cols = st.columns(2)
+        for idx, ins in enumerate(insights):
+            c = cols[idx % 2]
+            with c:
+                st.markdown(
+                    f"""
+                    <div class="meal-plan-card" style="border-left-color:#3b82f6;">
+                      <h4 style="margin-bottom:6px;">{ins.get('title','Insight')}</h4>
+                      <div style="color:#374151; line-height:1.35; font-size:0.95em;">
+                        {ins.get('detail','')}
+                      </div>
+                    </div>
+                    """,
+                    unsafe_allow_html=True,
+                )
 
 with tab6:
-    weight_tracker_tab()
+    water_tracker_tab()
 
 with tab7:
-    streaks_tab()
+    weight_tracker_tab()
 
 with tab8:
+    streaks_tab()
+
+with tab9:
     from utils.nutrition_assistant import assistant_tab_ui
     assistant_tab_ui(nutrition_df=nutrition_df, veg_pref=food_preference, allergies=allergies)
 
-with tab9:
+with tab10:
     from utils.smart_swap import smart_swap_tab_ui
     smart_swap_tab_ui(nutrition_df=nutrition_df, food_preference=food_preference, allergies=allergies)
+
+
+
 
 
 

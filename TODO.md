@@ -1,23 +1,10 @@
-# TODO - Smart Swap safety + improvements
-
-## Step 1
-- [ ] Fix veg_pref TypeError by making `_apply_diet_filter()` parameter names consistent everywhere in `utils/smart_swap.py`.
-
-## Step 2
-- [ ] Replace Smart Swap free-typed input with a searchable dropdown/selectbox based on `nutrition_df.index` (dataset foods) in `utils/smart_swap.py`.
-
-## Step 3
-- [ ] Improve swap suggestions ranking so alternatives are realistic healthy meal options (avoid boring outputs) in `utils/smart_swap.py`.
-
-## Step 4
-- [ ] Remove the banned Tip line from `utils/nutrition_assistant.py`.
-
-## Step 5
-- [ ] Add safe error handling + minor duplicate/robustness improvements where needed in swap/assistant logic.
-
-## Step 6
-- [ ] Run `python -m py_compile` checks for syntax/import errors.
-
-## Step 7
-- [ ] (Optional) Run `streamlit run app.py` if lightweight in this environment.
+- [x] Inspect current Meal Tracking data flow in app.py (done)
+- [ ] Add Nutrient Intelligence module (utils/nutrient_intelligence.py)
+- [ ] Add Insights module (utils/insights.py)
+- [ ] Improve Smart Swap ranking to consider nutrient similarity/more logical diverse swaps (edit utils/smart_swap.py)
+- [ ] Modify app.py:
+  - [ ] Add new “Insights” tab without breaking existing tab indexes
+  - [ ] Add Nutrient Intelligence UI/cards under Meal Tracking tab4
+- [ ] Ensure graceful degradation when micronutrient columns are missing
+- [ ] Run full app (streamlit run app.py) and fix any runtime/render errors
 

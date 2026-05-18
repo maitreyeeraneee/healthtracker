@@ -251,6 +251,11 @@ def suggest_swaps(
     src_fat = float(source_row.get("fat", 0) or 0)
     src_fiber = float(source_row.get("fiber", 0) or 0) if "fiber" in source_row.index else 0.0
 
+    # Optional micronutrient ranking if dataset provides them.
+    # We keep it robust: if columns are missing we fall back to macros only.
+    mic_cols = ["iron", "calcium", "vitamin_c", "vitamin_a", "vitamin_d", "folate"]
+    mic_cols = [c for c in mic_cols if c in nutrition_df.columns]
+
     def score(tgt_name: str, tgt_row: pd.Series, sim: float) -> float:
         tgt_kcal = float(tgt_row.get("kcal", 0) or 0)
         tgt_pro = float(tgt_row.get("protein", 0) or 0)
@@ -262,8 +267,19 @@ def suggest_swaps(
         fat_gain = (src_fat - tgt_fat)
         fiber_gain = (tgt_fiber - src_fiber)
 
-        # encourage lower calories and higher protein; similarity provides relevance
-        return (sim * 50) + cal_gain * 0.4 + pro_gain * 2.0 + fat_gain * 0.8 + fiber_gain * 1.2
+        # micronutrient uplift (higher is better), scaled down to keep macros dominant
+        mic_gain = 0.0
+        if mic_cols:
+            for c in mic_cols:
+                src_v = float(source_row.get(c, 0) or 0)
+                tgt_v = float(tgt_row.get(c, 0) or 0)
+                if tgt_v > src_v:
+                    mic_gain += (tgt_v - src_v)
+
+        # Encourage lower calories and higher protein; similarity provides relevance.
+        return (sim * 50) + cal_gain * 0.4 + pro_gain * 2.0 + fat_gain * 0.8 + fiber_gain * 1.2 + mic_gain * 0.01
+
+
 
     scored = []
     for name, row in cand_nut.iterrows():
