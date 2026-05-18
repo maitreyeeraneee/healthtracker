@@ -110,13 +110,49 @@ _FOOD_NAME_NORMALIZATION = {
     'Roti': 'Roti',
 }
 
-# Very small compatibility rules to prevent clearly incompatible pairings.
+# Compatibility rules to prevent clearly incompatible pairings.
 # (We apply these during multi-item slot composition; current generator uses compatibility-aware picking.)
 INCOMPATIBLE_PAIRS = {
     ('lemon', 'curd'),
     ('lemon', 'dahi'),
     ('lemon', 'yogurt'),
 }
+
+# Pairing rules: if these foods appear, they MUST be paired with another from the same rule group.
+# This ensures dal appears with rice/roti, etc.
+PAIRING_RULES = {
+    'dal_group': {
+        'triggers': ['dal', 'chana masala', 'chole', 'rajma', 'sambar', 'rasam', 'moong dal', 'masoor dal',
+                     'dal tadka', 'dal fry'],
+        'required_pair': ['rice', 'roti', 'chapati', 'brown rice', 'basmati rice', 'jeera rice', 'curd rice',
+                          'bread', 'brown bread', 'quinoa'],
+    },
+}
+
+# Redundant combo avoidance: never include BOTH items from the same pair in one meal slot
+REDUNDANT_PAIRS = [
+    # Dairy redundancies
+    ('skim milk', 'buttermilk'),
+    ('milk', 'buttermilk'),
+    ('curd', 'buttermilk'),
+    ('yogurt', 'buttermilk'),
+    ('yogurt', 'lassi'),
+    ('curd', 'lassi'),
+    ('milk', 'lassi'),
+    ('low-fat curd', 'buttermilk'),
+    # Duplicate carb sources
+    ('rice', 'roti'),
+    ('rice', 'chapati'),
+    ('roti', 'chapati'),
+    ('rice', 'bread'),
+    ('roti', 'bread'),
+    # Multiple dal types
+    ('dal', 'chole'),
+    ('dal', 'rajma'),
+    ('chole', 'rajma'),
+    ('dal tadka', 'dal fry'),
+    ('moong dal', 'masoor dal'),
+]
 
 # Additional strict "junk / unhealthy" ban list for generated meal plans.
 # Requirement: keep these items in dataset/search/logging, but NEVER show in generated healthy plans.
@@ -475,6 +511,31 @@ def pick_meal_for_slot(filtered_df: pd.DataFrame, slot_target_kcal: float,
     else:
         preferred_sizes = [3, 4, 2, 5]
 
+    def _has_redundant_pair(names_list: List[str]) -> bool:
+        """Check if the meal combo has redundant pairs."""
+        for (a, b) in REDUNDANT_PAIRS:
+            a_found = any(a in n.lower() for n in names_list)
+            b_found = any(b in n.lower() for n in names_list)
+            if a_found and b_found:
+                return True
+        return False
+
+    def _enforce_pairing_rules(names_list: List[str]) -> bool:
+        """If a trigger food is present, ensure a required_pair food is also present."""
+        for rule_name, rule in PAIRING_RULES.items():
+            has_trigger = any(
+                any(trig in n.lower() for trig in rule['triggers'])
+                for n in names_list
+            )
+            if has_trigger:
+                has_required = any(
+                    any(req in n.lower() for req in rule['required_pair'])
+                    for n in names_list
+                )
+                if not has_required:
+                    return False
+        return True
+
     def _food_category_flags(food_name) -> Dict[str, bool]:
         n = str(food_name or '').lower()
         flags = {
@@ -511,6 +572,15 @@ def pick_meal_for_slot(filtered_df: pd.DataFrame, slot_target_kcal: float,
         # Enforce complete meal structure
         names = [m['Food'] for m in meal_items_]
         cats = [_food_category_flags(x) for x in names]
+
+        # Enforce redundant pair avoidance
+        if _has_redundant_pair(names):
+            return False
+
+        # Enforce pairing rules (e.g., dal must pair with rice/roti)
+        if not _enforce_pairing_rules(names):
+            return False
+
         has_protein = any(c['protein'] or c['legume_or_dal'] for c in cats)
         has_carb = any(c['carb'] for c in cats)
         has_veg_or_fiber = any(c['veg_or_fiber'] for c in cats) or any(c['fruit'] for c in cats)
@@ -1056,13 +1126,65 @@ def generate_smart_swaps(original_meal, nutrition_df, veg_flag='none'):
     if candidates.empty:
         return []
 
-    # Pick the best candidates (highest protein density) - return up to 5 for variety
+    # Ensure at least 5 candidates by relaxing criteria further if needed
     candidates = candidates.copy()
     candidates['protein_density'] = candidates['protein'] / candidates['kcal']
-    candidates = candidates.sort_values('protein_density', ascending=False).head(5)  # Top 5 for more swap variety
+
+    # Try to get at least 5 swaps; if not enough, relax more
+    if len(candidates) < 5:
+        # Drastically relax criteria to find more options
+        more_candidates = nutrition_df[
+            (nutrition_df.index != food)
+        ]
+        if veg_flag in ('vegetarian', 'vegan'):
+            idx_lower2 = more_candidates.index.astype(str).str.lower()
+            drop_mask2 = np.zeros(len(more_candidates), dtype=bool)
+            veg_exclude_keywords_short = [
+                'chicken', 'meat', 'fish', 'beef', 'pork', 'lamb',
+                'egg', 'boiled egg', 'omelette',
+            ] if veg_flag == 'vegetarian' else [
+                'chicken', 'meat', 'fish', 'beef', 'pork', 'lamb',
+                'milk', 'curd', 'yogurt', 'paneer', 'cheese', 'butter',
+                'egg', 'buttermilk', 'lassi',
+            ]
+            for kw in veg_exclude_keywords_short:
+                pattern = _word_boundary_pattern(kw)
+                drop_mask2 |= idx_lower2.str.contains(pattern, na=False, regex=True)
+            more_candidates = more_candidates[~drop_mask2]
+
+        # Combine strict candidates with relaxed ones, deduplicate, take at least 5
+        extra_candidates = more_candidates[~more_candidates.index.isin(candidates.index)]
+        # Take top 10 by protein density similarity
+        extra_candidates = extra_candidates.copy()
+        extra_candidates['cal_diff'] = abs(extra_candidates['kcal'] / 100 - target_calories / 100)
+        extra_candidates = extra_candidates.sort_values('cal_diff')
+        extra_candidates = extra_candidates.head(10)
+        candidates = pd.concat([candidates, extra_candidates])
+        # Remove duplicate index
+        candidates = candidates[~candidates.index.duplicated(keep='first')]
+
+    # Shuffle to add variety, then sort by protein density
+    candidates = candidates.sample(frac=1.0, random_state=random.randint(1, 9999)).copy()
+    candidates['protein_density'] = candidates['protein'] / candidates['kcal'].clip(lower=1)
+    candidates = candidates.sort_values('protein_density', ascending=False)
+
+    # Return up to 6+ swaps, keep at least 5
+    max_swaps = max(5, min(len(candidates), 8))
 
     swaps = []
+    used_swap_names = set()
     for _, best_swap in candidates.iterrows():
+        if len(swaps) >= max_swaps:
+            break
+        swap_name = str(best_swap.name)
+        # Avoid suggesting the same food
+        if swap_name in used_swap_names:
+            continue
+        # Avoid suggesting the original food
+        if swap_name == food:
+            continue
+        used_swap_names.add(swap_name)
+
         # Calculate quantity to match original calories
         swap_calories_per_100g = best_swap['kcal']
         if swap_calories_per_100g <= 0:
