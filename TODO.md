@@ -1,10 +1,15 @@
-- [x] Inspect current Meal Tracking data flow in app.py (done)
-- [ ] Add Nutrient Intelligence module (utils/nutrient_intelligence.py)
-- [ ] Add Insights module (utils/insights.py)
-- [ ] Improve Smart Swap ranking to consider nutrient similarity/more logical diverse swaps (edit utils/smart_swap.py)
-- [ ] Modify app.py:
-  - [ ] Add new “Insights” tab without breaking existing tab indexes
-  - [ ] Add Nutrient Intelligence UI/cards under Meal Tracking tab4
-- [ ] Ensure graceful degradation when micronutrient columns are missing
-- [ ] Run full app (streamlit run app.py) and fix any runtime/render errors
+# TODO
+
+## Healthtracker improvements
+
+- [x] Remove separate “Insights” tab completely (keep Meal Tracker insights inside Meal Tracking unchanged).
+
+- [ ] Improve Smart Swap tab: generate multiple logical healthy swaps, not a single weak option; show short reasons per swap.
+
+- [ ] Strengthen Smart Swap allergy filtering so it consistently excludes user-selected allergy foods from:
+  - meal generation
+  - meal replacements (smart swaps)
+  - refresh/regenerate logic
+  - Smart Swap tab options.
+- [ ] Run the full app and fix any runtime/rendering/filtering/chart errors until the app launches cleanly.
 

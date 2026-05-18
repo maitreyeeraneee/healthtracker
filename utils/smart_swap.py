@@ -39,11 +39,13 @@ def build_swap_index(nutrition_df: pd.DataFrame):
 
 
 def _apply_diet_filter(df: pd.DataFrame, veg_pref: str, allergies_csv: str = "") -> pd.DataFrame:
-    """Conservative dataset-category filtering for Smart Swap.
+    """Conservative filtering for Smart Swap.
 
-    Keep signature consistent with other modules:
-      - veg_pref keyword is used by callers
-      - allergies_csv is accepted for safety (handled here)
+    Requirements:
+    - respect veg preference using dataset category
+    - avoid foods matching user allergies using BOTH:
+        1) category substring match
+        2) food-name keyword match (e.g., dairy -> milk/curd/paneer/whey/cheese...)
     """
     if df is None or df.empty:
         return df
@@ -54,6 +56,7 @@ def _apply_diet_filter(df: pd.DataFrame, veg_pref: str, allergies_csv: str = "")
 
     out = df
 
+    # Veg filtering
     if v in {"vegetarian", "vegan"} and "category" in out.columns:
         cat = out["category"].astype(str).str.lower()
         if v == "vegan":
@@ -61,17 +64,75 @@ def _apply_diet_filter(df: pd.DataFrame, veg_pref: str, allergies_csv: str = "")
         else:
             out = out[~cat.isin(["non-veg"])]
 
-    # Optional allergy filtering (substring match on category)
-    if allergies_csv and "category" in out.columns:
-        allergies_list = [a.strip().lower() for a in str(allergies_csv).split(",") if a.strip()]
-        if allergies_list:
+    # Allergy keyword mapping (extendable). Kept conservative.
+    allergy_keywords_map = {
+        # dairy
+        "dairy": [
+            "milk", "curd", "dahi", "yogurt", "greek yogurt", "buttermilk", "lassi",
+            "paneer", "cheese", "whey", "cottage cheese", "whey protein",
+        ],
+        "lactose": ["milk", "curd", "dahi", "yogurt", "lassi", "buttermilk", "whey"],
+        # nuts
+        "nut": [
+            "almond", "almonds", "walnut", "walnuts", "peanut", "peanuts",
+            "cashew", "cashews", "pistachio", "pistachios", "hazelnut", "hazelnuts",
+            "nut", "nut butter", "peanut butter", "mixed nuts",
+        ],
+        "nuts": [
+            "almond", "almonds", "walnut", "walnuts", "peanut", "peanuts",
+            "cashew", "cashews", "pistachio", "pistachios", "hazelnut", "hazelnuts",
+            "nut", "nut butter", "peanut butter", "mixed nuts",
+        ],
+        # eggs
+        "egg": ["egg", "boiled egg", "omelette", "egg white"],
+        "eggs": ["egg", "boiled egg", "omelette", "egg white"],
+        # gluten / wheat (if present in dataset)
+        "gluten": ["wheat", "atta", "maida", "bread", "flour"],
+        "wheat": ["wheat", "atta", "maida"],
+        # soy
+        "soy": ["soy", "soybeans", "tofu", "tempeh", "edamame"],
+        "sesame": ["sesame", "til"],
+    }
+
+    allergies_list = [a.strip().lower() for a in str(allergies_csv or "").split(",") if a.strip()]
+    if allergies_list:
+        # 1) category-based conservative filtering
+        if "category" in out.columns:
             cat = out["category"].astype(str).str.lower()
             mask = np.ones(len(out), dtype=bool)
             for a in allergies_list:
+                # Use substring match on category
                 mask &= ~cat.str.contains(re.escape(a), na=False)
             out = out[mask]
 
+        # 2) food-name keyword filtering
+        idx_lower = out.index.astype(str).str.lower()
+        name_mask = np.ones(len(out), dtype=bool)
+
+        # build patterns
+        for a in allergies_list:
+            # normalize to map keys by substring
+            key_matched = None
+            for k in allergy_keywords_map.keys():
+                if k in a or a in k:
+                    key_matched = k
+                    break
+            keywords = allergy_keywords_map.get(key_matched, [])
+            # If allergy term itself is like "dairy" or "nuts" but not matched, still attempt direct containment
+            if not keywords:
+                keywords = [a]
+
+            for kw in keywords:
+                if not kw:
+                    continue
+                # word boundary for single tokens; substring for multi-word phrases
+                pattern = _word_boundary_pattern(kw) if " " not in kw else kw.lower()
+                name_mask &= ~idx_lower.str.contains(pattern, na=False, regex=True)
+
+        out = out[name_mask]
+
     return out
+
 
 
 
@@ -114,6 +175,7 @@ def _reasons_for_recommendation(src: pd.Series, tgt: pd.Series) -> List[str]:
 
     src_fiber = gv(src.get("fiber", 0)) if "fiber" in src.index else 0.0
     tgt_fiber = gv(tgt.get("fiber", 0)) if "fiber" in tgt.index else 0.0
+
 
     # Lower calories
     if tgt_kcal < src_kcal:

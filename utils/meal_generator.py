@@ -1117,7 +1117,35 @@ def filter_foods_by_preferences(nutrition_df, food_preference, allergies, cuisin
     return filter_meals(nutrition_df, preferences)
 
 
-def generate_smart_swaps(original_meal, nutrition_df, veg_flag='none'):
+def _safe_get_nutrition_value(nutrition_df, food_name, column, default=0.0):
+    """
+    Safely extract a scalar nutrition value from the DataFrame even when
+    the index has duplicate entries (which causes .loc to return a Series).
+    
+    Handles:
+    - Food not in index -> returns default
+    - Single match -> returns scalar
+    - Duplicate matches -> returns first value (via .iloc[0])
+    - NaN values -> returns default
+    """
+    import pandas as pd
+    try:
+        if food_name not in nutrition_df.index:
+            return default
+        val = nutrition_df.loc[food_name, column]
+        if isinstance(val, pd.Series):
+            # Duplicate index entry - take first value
+            val = val.iloc[0]
+        val = pd.to_numeric(val, errors='coerce')
+        if pd.isna(val):
+            return default
+        return float(val)
+    except Exception:
+        return default
+
+
+def generate_smart_swaps(original_meal, nutrition_df, veg_flag='none', allergies: str = ""):
+
     """
     Generate smart food swap with calculated quantity to match original macros.
     Respects dietary preferences (veg_flag) to avoid suggesting banned foods.
@@ -1130,33 +1158,66 @@ def generate_smart_swaps(original_meal, nutrition_df, veg_flag='none'):
     Returns:
         List of dicts with 'food', 'amount', 'calories', 'protein', 'carbs', 'fat' for best swaps
     """
+    # Defensive checks
+    if nutrition_df is None or nutrition_df.empty:
+        return []
+    required_cols = ['kcal', 'protein']
+    for col in required_cols:
+        if col not in nutrition_df.columns:
+            return []
+
     if isinstance(original_meal, str):
         food = original_meal
         if food not in nutrition_df.index:
             return []
-        target_calories = nutrition_df.loc[food, 'kcal']
-        target_protein = nutrition_df.loc[food, 'protein']
+        target_calories = _safe_get_nutrition_value(nutrition_df, food, 'kcal', 0.0)
+        target_protein = _safe_get_nutrition_value(nutrition_df, food, 'protein', 0.0)
     else:
         food = original_meal.get('Food', '')
-        target_calories = original_meal.get('Calories', 0)
-        target_protein = original_meal.get('Protein', 0)
+        target_calories = float(original_meal.get('Calories', 0) or 0)
+        target_protein = float(original_meal.get('Protein', 0) or 0)
 
-    if food not in nutrition_df.index:
+    if not food or food not in nutrition_df.index:
         return []
+
+    # Ensure targets are scalar (float), not Series/DataFrame
+    if isinstance(target_calories, (pd.Series, pd.DataFrame)):
+        target_calories = float(target_calories.iloc[0]) if len(target_calories) > 0 else 0.0
+    else:
+        try:
+            target_calories = float(target_calories)
+        except (ValueError, TypeError):
+            target_calories = 0.0
+
+    if isinstance(target_protein, (pd.Series, pd.DataFrame)):
+        target_protein = float(target_protein.iloc[0]) if len(target_protein) > 0 else 0.0
+    else:
+        try:
+            target_protein = float(target_protein)
+        except (ValueError, TypeError):
+            target_protein = 0.0
+
+    # Defensive: skip if target values are zero or NaN
+    if target_calories <= 0 or pd.isna(target_calories):
+        return []
+
+    # Ensure kcal and protein columns are numeric, coercing errors
+    kcal_col = pd.to_numeric(nutrition_df['kcal'], errors='coerce')
+    protein_col = pd.to_numeric(nutrition_df['protein'], errors='coerce')
 
     # Find candidates with similar calories and protein (±10%)
     candidates = nutrition_df[
-        (nutrition_df['kcal'] >= target_calories * 0.9) &
-        (nutrition_df['kcal'] <= target_calories * 1.1) &
-        (nutrition_df['protein'] >= target_protein * 0.9) &
-        (nutrition_df['protein'] <= target_protein * 1.1) &
+        (kcal_col >= target_calories * 0.9) &
+        (kcal_col <= target_calories * 1.1) &
+        (protein_col >= target_protein * 0.9) &
+        (protein_col <= target_protein * 1.1) &
         (nutrition_df.index != food)
     ]
 
     if candidates.empty:
         candidates = nutrition_df[
-            (nutrition_df['kcal'] >= target_calories * 0.8) &
-            (nutrition_df['kcal'] <= target_calories * 1.2) &
+            (kcal_col >= target_calories * 0.8) &
+            (kcal_col <= target_calories * 1.2) &
             (nutrition_df.index != food)
         ]
 
@@ -1173,7 +1234,7 @@ def generate_smart_swaps(original_meal, nutrition_df, veg_flag='none'):
 
     # Ensure at least 5 candidates by relaxing criteria further if needed
     candidates = candidates.copy()
-    candidates['protein_density'] = candidates['protein'] / candidates['kcal']
+    candidates['protein_density'] = candidates['protein'] / candidates['kcal'].clip(lower=1)
 
     if len(candidates) < 5:
         more_candidates = nutrition_df[
@@ -1209,7 +1270,7 @@ def generate_smart_swaps(original_meal, nutrition_df, veg_flag='none'):
             continue
         used_swap_names.add(swap_name)
 
-        swap_calories_per_100g = best_swap['kcal']
+        swap_calories_per_100g = _safe_get_nutrition_value(nutrition_df, swap_name, 'kcal', 0.0)
         if swap_calories_per_100g <= 0:
             quantity_g = 100.0
         else:
@@ -1222,10 +1283,10 @@ def generate_smart_swaps(original_meal, nutrition_df, veg_flag='none'):
         swaps.append({
             'food': best_swap.name,
             'amount': f"{display_amount} {display_unit}",
-            'calories': round(scale_factor * best_swap['kcal'], 1),
-            'protein': round(scale_factor * best_swap['protein'], 1),
-            'carbs': round(scale_factor * best_swap['carbs'], 1),
-            'fat': round(scale_factor * best_swap['fat'], 1)
+            'calories': round(scale_factor * _safe_get_nutrition_value(nutrition_df, swap_name, 'kcal', 0.0), 1),
+            'protein': round(scale_factor * _safe_get_nutrition_value(nutrition_df, swap_name, 'protein', 0.0), 1),
+            'carbs': round(scale_factor * _safe_get_nutrition_value(nutrition_df, swap_name, 'carbs', 0.0), 1),
+            'fat': round(scale_factor * _safe_get_nutrition_value(nutrition_df, swap_name, 'fat', 0.0), 1)
         })
 
     return swaps

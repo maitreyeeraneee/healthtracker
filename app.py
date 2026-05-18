@@ -301,7 +301,6 @@ tab_labels = [
     "Meal Plan Generator",
     "Health Metrics",
     "Meal Tracking",
-    "Insights",
     "Water",
     "Weight",
     "Streaks",
@@ -339,7 +338,7 @@ except Exception:
 
 
 # Map to original variable names to avoid changing UI logic.
-(tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8, tab9, tab10) = tabs
+(tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8, tab9) = tabs
 
 # New tab mapping (inserted after Meal Tracking):
 # tab5 => Insights, tab6 => Water, tab7 => Weight, tab8 => Streaks, tab9 => Assistant, tab10 => Smart Swap
@@ -505,7 +504,8 @@ with tab2:
                         for i, meal in enumerate(meals_of_type):
 
                             # Generate smart swaps for this food (respect dietary preferences)
-                            smart_swaps = generate_smart_swaps(meal['Food'], nutrition_df, food_preference)
+                            smart_swaps = generate_smart_swaps(meal['Food'], nutrition_df, food_preference, allergies=allergies)
+
 
                             col1, col2 = st.columns([3, 1])
                             with col1:
@@ -825,53 +825,26 @@ with tab4:
                 st.plotly_chart(meal_wise_chart, use_container_width=True)
 
 with tab5:
-    from utils.insights import build_insights
-
-    st.header("Insights")
-    if not st.session_state.daily_log:
-        st.info("Log meals to unlock insights.")
-    else:
-        # Uses only meal logs (current app stores date-level logs). Weight/workout logs are optional.
-        insights = build_insights(
-            daily_log=st.session_state.daily_log,
-            targets=None,
-            weight_log=st.session_state.get("weight_log"),
-            workout_log=st.session_state.get("workout_log"),
-        )
-
-
-        cols = st.columns(2)
-        for idx, ins in enumerate(insights):
-            c = cols[idx % 2]
-            with c:
-                st.markdown(
-                    f"""
-                    <div class="meal-plan-card" style="border-left-color:#3b82f6;">
-                      <h4 style="margin-bottom:6px;">{ins.get('title','Insight')}</h4>
-                      <div style="color:#374151; line-height:1.35; font-size:0.95em;">
-                        {ins.get('detail','')}
-                      </div>
-                    </div>
-                    """,
-                    unsafe_allow_html=True,
-                )
-
-with tab6:
     water_tracker_tab()
 
-with tab7:
+with tab6:
     weight_tracker_tab()
 
-with tab8:
+with tab7:
     streaks_tab()
 
-with tab9:
+with tab8:
     from utils.nutrition_assistant import assistant_tab_ui
     assistant_tab_ui(nutrition_df=nutrition_df, veg_pref=food_preference, allergies=allergies)
 
-with tab10:
+with tab9:
     from utils.smart_swap import smart_swap_tab_ui
     smart_swap_tab_ui(nutrition_df=nutrition_df, food_preference=food_preference, allergies=allergies)
+
+
+
+
+
 
 
 
