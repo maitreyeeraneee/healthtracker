@@ -89,91 +89,107 @@ if 'show_plan_types' not in st.session_state:
 # Load data
 nutrition_df, tips_df, daily_meals_df = load_data()
 
-# Custom CSS
+# Custom CSS - Modern, subtle, clean design
 st.markdown("""
 <style>
+    /* Meal plan cards - subtle modern design */
     .meal-plan-card {
-        background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
-        border-radius: 15px;
-        padding: 25px;
-        margin: 15px 0;
-        color: white;
-        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-        transition: transform 0.3s ease;
-        border: 2px solid #388E3C;
+        background: #f8f9fa;
+        border-radius: 12px;
+        padding: 20px 25px;
+        margin: 12px 0;
+        border-left: 4px solid #10b981;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    }
+    .meal-plan-card h4 {
+        color: #374151;
+        font-size: 1.1em;
+        font-weight: 600;
+        margin: 0 0 12px 0;
     }
     .meal-plan-card:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     }
+    /* Meal items - clean cards */
     .meal-item {
-        background: rgba(255, 255, 255, 0.95);
-        border-radius: 10px;
-        padding: 15px;
-        margin: 8px 0;
-        color: #2E7D32;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        border-left: 4px solid #4CAF50;
+        background: white;
+        border-radius: 8px;
+        padding: 12px 15px;
+        margin: 6px 0;
+        color: #4b5563;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        border-left: 3px solid #d1d5db;
+        font-size: 0.95em;
     }
     .meal-item strong {
-        color: #1B5E20;
-        font-size: 1.1em;
+        color: #1f2937;
+        font-weight: 600;
     }
+    /* Metric cards - subtle gradient */
     .metric-card {
-        background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
-        border-radius: 15px;
-        padding: 20px;
-        margin: 15px 0;
-        color: white;
+        background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+        border-radius: 12px;
+        padding: 18px 20px;
+        margin: 10px 0;
+        color: #0c4a6e;
         text-align: center;
-        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-        border: 2px solid #0D47A1;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+        border: 1px solid #bae6fd;
     }
     .tab-content {
         padding: 25px;
-        background: #f5f5f5;
-        border-radius: 15px;
+        background: #f9fafb;
+        border-radius: 12px;
         margin: 15px 0;
-        border: 1px solid #e0e0e0;
+        border: 1px solid #e5e7eb;
     }
     .progress-bar {
-        height: 25px;
-        border-radius: 12px;
-        background: #e0e0e0;
+        height: 8px;
+        border-radius: 4px;
+        background: #e5e7eb;
         overflow: hidden;
-        margin: 10px 0;
+        margin: 8px 0;
     }
     .progress-fill {
         height: 100%;
-        background: linear-gradient(90deg, #4CAF50, #66BB6A);
+        background: linear-gradient(90deg, #10b981, #34d399);
         transition: width 0.3s ease;
     }
+    /* Smart swap button - subtle */
     .smart-swap-btn {
-        background: #FF9800;
-        color: white;
-        border: none;
-        padding: 5px 10px;
-        border-radius: 5px;
+        background: #fef3c7;
+        color: #92400e;
+        border: 1px solid #fcd34d;
+        padding: 6px 12px;
+        border-radius: 6px;
         cursor: pointer;
-        font-size: 0.8em;
-        margin-left: 10px;
+        font-size: 0.85em;
+        margin-left: 8px;
+        transition: all 0.2s ease;
     }
     .smart-swap-btn:hover {
-        background: #F57C00;
+        background: #fde68a;
+        border-color: #fbbf24;
     }
+    /* Plan option cards - clean */
     .plan-option-card {
-        background: linear-gradient(135deg, #9C27B0 0%, #7B1FA2 100%);
-        border-radius: 15px;
-        padding: 20px;
+        background: white;
+        border-radius: 12px;
+        padding: 18px 20px;
         margin: 10px 0;
-        color: white;
+        color: #4b5563;
         cursor: pointer;
-        transition: all 0.3s ease;
-        border: 2px solid #6A1B9A;
+        transition: all 0.2s ease;
+        border: 2px solid #e5e7eb;
     }
     .plan-option-card:hover {
-        transform: scale(1.02);
-        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        border-color: #10b981;
+        box-shadow: 0 4px 6px rgba(16, 185, 129, 0.1);
+    }
+    .plan-option-card h4 {
+        color: #1f2937;
+        font-weight: 600;
+        margin: 0 0 8px 0;
     }
     @media (max-width: 768px) {
         .meal-plan-metrics {
@@ -207,51 +223,68 @@ with st.sidebar:
     allergies = st.text_input("Allergies (comma-separated)", "")
 
     if st.button("Calculate My Needs"):
-        try:
-            bmr, tdee = calculate_bmr_tdee(age, weight, height, gender, activity_level)
-            adjusted_calories = tdee
+        # Input validation
+        validation_errors = []
+        if height <= 0:
+            validation_errors.append("Height must be greater than 0")
+        if weight <= 0:
+            validation_errors.append("Weight must be greater than 0")
+        if age <= 0:
+            validation_errors.append("Age must be greater than 0")
+        if height > 250:
+            validation_errors.append("Height seems unrealistic (max 250 cm)")
+        if weight > 300:
+            validation_errors.append("Weight seems unrealistic (max 300 kg)")
 
-            if goal == "Lose weight":
-                adjusted_calories -= 500
-            elif goal == "Gain muscle":
-                adjusted_calories += 500
+        if validation_errors:
+            for error in validation_errors:
+                st.error(f"❌ {error}")
+        else:
+            try:
+                bmr, tdee = calculate_bmr_tdee(age, weight, height, gender, activity_level)
+                adjusted_calories = tdee
 
-            protein_pct, carbs_pct, fat_pct, protein_g, carbs_g, fat_g = calculate_macros(adjusted_calories, goal)
+                if goal == "Lose weight":
+                    adjusted_calories -= 500
+                elif goal == "Gain muscle":
+                    adjusted_calories += 500
 
-            # Additional calculations
-            ideal_weight = calculate_ideal_body_weight(height, gender)
-            body_fat_pct = calculate_body_fat_percentage(weight, height, age, gender)
-            lean_body_mass = calculate_lean_body_mass(weight, body_fat_pct)
-            protein_target = calculate_protein_target(weight, goal)
-            water_intake = calculate_daily_water_intake(weight, activity_level)
+                protein_pct, carbs_pct, fat_pct, protein_g, carbs_g, fat_g = calculate_macros(adjusted_calories, goal)
 
-            # Calculate calorie balance if meal plan exists
-            calorie_balance = 0
-            if st.session_state.meal_plan:
-                consumed_calories = sum(meal['Calories'] for day_meals in st.session_state.meal_plan.values() for meal in day_meals)
-                calorie_balance = calculate_calorie_balance(consumed_calories, adjusted_calories)
+                # Additional calculations
+                ideal_weight = calculate_ideal_body_weight(height, gender)
+                body_fat_pct = calculate_body_fat_percentage(weight, height, age, gender)
+                lean_body_mass = calculate_lean_body_mass(weight, body_fat_pct)
+                protein_target = calculate_protein_target(weight, goal)
+                water_intake = calculate_daily_water_intake(weight, activity_level)
 
-            # Store in session state
-            st.session_state.adjusted_calories = adjusted_calories
-            st.session_state.protein_g = protein_g
-            st.session_state.carbs_g = carbs_g
-            st.session_state.fat_g = fat_g
-            st.session_state.bmr = bmr
-            st.session_state.tdee = tdee
-            st.session_state.ideal_weight = ideal_weight
-            st.session_state.body_fat_pct = body_fat_pct
-            st.session_state.lean_body_mass = lean_body_mass
-            st.session_state.protein_target = protein_target
-            st.session_state.water_intake = water_intake
-            st.session_state.calorie_balance = calorie_balance
-            st.session_state.metrics_calculated = True
+                # Calculate calorie balance if meal plan exists
+                calorie_balance = 0
+                if st.session_state.meal_plan:
+                    consumed_calories = sum(meal['Calories'] for day_meals in st.session_state.meal_plan.values() for meal in day_meals)
+                    calorie_balance = calculate_calorie_balance(consumed_calories, adjusted_calories)
 
-            bmi, bmi_category = calculate_bmi(weight, height)
-            st.session_state.bmi = bmi
-            st.session_state.bmi_category = bmi_category
+                # Store in session state
+                st.session_state.adjusted_calories = adjusted_calories
+                st.session_state.protein_g = protein_g
+                st.session_state.carbs_g = carbs_g
+                st.session_state.fat_g = fat_g
+                st.session_state.bmr = bmr
+                st.session_state.tdee = tdee
+                st.session_state.ideal_weight = ideal_weight
+                st.session_state.body_fat_pct = body_fat_pct
+                st.session_state.lean_body_mass = lean_body_mass
+                st.session_state.protein_target = protein_target
+                st.session_state.water_intake = water_intake
+                st.session_state.calorie_balance = calorie_balance
+                st.session_state.metrics_calculated = True
 
-        except Exception as e:
-            st.error(f"Error calculating metrics: {str(e)}")
+                bmi, bmi_category = calculate_bmi(weight, height)
+                st.session_state.bmi = bmi
+                st.session_state.bmi_category = bmi_category
+
+            except Exception as e:
+                st.error(f"Error calculating metrics: {str(e)}")
 
 from water_tracker import water_tracker_tab
 from weight_tracker import weight_tracker_tab

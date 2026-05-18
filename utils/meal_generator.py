@@ -106,16 +106,21 @@ INCOMPATIBLE_PAIRS = {
     ('lemon', 'yogurt'),
 }
 
-# Additional strict “junk / unhealthy” ban list for generated meal plans.
+# Additional strict "junk / unhealthy" ban list for generated meal plans.
 # Requirement: keep these items in dataset/search/logging, but NEVER show in generated healthy plans.
 JUNK_MEAL_HARDBAN_KEYWORDS = {
-    'nood', 'maggi', 'chip', 'frie', 'fry',
+    # Instant/processed foods
+    'nood', 'maggi', 'chip', 'frie', 'instant noodle',
+    # Fast food / street junk
     'pizza', 'burger', 'bhel', 'sev puri', 'vada pav', 'frankie',
-    'samosa',
+    'samosa', 'pakora', 'kachori',
     # desserts / bakery (high sugar/fat)
     'chocolate', 'ice cream', 'cupcake', 'muffin', 'brownie', 'biscuit', 'cookie',
+    'donut', 'croissant', 'pastry', 'cake',
     # generic category-like strings
-    'dessert', 'bakery'
+    'dessert', 'bakery', 'soft drink', 'soda',
+    # High sugar items
+    'milkshake', 'sugar'
 }
 
 # Keep legacy constant name, but DO NOT enforce protein-shake-only output.
@@ -328,18 +333,15 @@ def pick_meal_for_slot(filtered_df: pd.DataFrame, slot_target_kcal: float,
     """Pick items for a slot and compose a *complete* meal."""
 
     # NOTE: Original docstring was corrupted during earlier edits; keeping this minimal.
+    # Args:
+    #   filtered_df: Filtered nutrition dataframe
+    #   slot_target_kcal: Target calories for this slot (passed as tuple: (slot_name, target_kcal))
+    #   used_foods: Foods already used today
+    #   ban_list: Foods to ban (e.g., repeats from previous days)
+    #   prefer_high_protein: Whether to prefer high-protein foods
+    # Returns:
+    #   List of meal items with portions and macros
 
-    Args:
-
-        filtered_df: Filtered nutrition dataframe
-        slot_target_kcal: Target calories for this slot (passed as tuple: (slot_name, target_kcal))
-        used_foods: Foods already used today
-        ban_list: Foods to ban (e.g., repeats from previous days)
-        prefer_high_protein: Whether to prefer high-protein foods
-
-    Returns:
-        List of meal items with portions and macros
-    """
     # Unpack slot name and target calories
     if isinstance(slot_target_kcal, tuple):
         slot_name, target_kcal = slot_target_kcal
@@ -369,7 +371,7 @@ def pick_meal_for_slot(filtered_df: pd.DataFrame, slot_target_kcal: float,
     # Remove used and banned foods
     available_df = slot_df[~slot_df.index.isin(used_foods + ban_list)]
 
-    # Generator-side strict bans to guarantee “healthy realistic” output.
+    # Generator-side strict bans to guarantee "healthy realistic" output.
     # Keep these foods in dataset/search/logging; only exclude them from generated plans.
     if len(available_df) > 0:
         idx_lower = available_df.index.astype(str).str.lower()
@@ -409,12 +411,12 @@ def pick_meal_for_slot(filtered_df: pd.DataFrame, slot_target_kcal: float,
     available_df = available_df.sort_values('score', ascending=False)
 
 
-    # Stochastic sampling: prioritize complete meals with 2–5 items (never 1 for main meals).
+    # Stochastic sampling: prioritize complete meals with 2-5 items (never 1 for main meals).
     best_combination: List[Dict[str, Any]] = []
     best_score = -1.0
-    tolerance = 0.15  # ±15% tolerance
+    tolerance = 0.15  # +/-15% tolerance
 
-    # Dynamic item counts: Breakfast/Lunch/Dinner => 2–5; Snack => 1–3
+    # Dynamic item counts: Breakfast/Lunch/Dinner => 2-5; Snack => 1-3
     if slot_name.lower() == 'snack':
         preferred_sizes = [2, 3, 1]
     else:
@@ -516,7 +518,7 @@ def pick_meal_for_slot(filtered_df: pd.DataFrame, slot_target_kcal: float,
         if best_combination:
             break
 
-    # Fallback: build a 2-item complete meal (main meals) or 1–2-item (snack)
+    # Fallback: build a 2-item complete meal (main meals) or 1-2-item (snack)
     if not best_combination and len(available_df) > 0:
         fallback_size = 1 if slot_name.lower() == 'snack' else 2
         fallback_size = min(fallback_size, len(available_df))
@@ -901,8 +903,6 @@ def filter_foods_by_preferences(nutrition_df, food_preference, allergies, cuisin
     preferences = {
         'veg_flag': food_preference.lower() if food_preference != "None" else 'none',
         'allergens': [a.strip().lower() for a in allergies.split(',') if a.strip()],
-        'cuisine': cuisine_preference.lower() if cuisine_preference and cuisine_preference != "Any" else 'any',
-        'health_level': 'light'  # Default
     }
     return filter_meals(nutrition_df, preferences)
 
