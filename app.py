@@ -9,9 +9,8 @@ import re
 from dotenv import load_dotenv
 load_dotenv()
 
-from utils.gemini_food_recognition import detect_food_from_image
-
 from constants import DEFAULT_TARGETS
+
 
 
 from utils import (
@@ -297,7 +296,17 @@ from streaks import streaks_tab
 
 # Main content
 
-tab_labels = ["BMI & Daily Calorie Needs", "Meal Plan Generator", "Health Metrics", "Meal Tracking", "Water", "Weight", "Streaks"]
+tab_labels = [
+    "BMI & Daily Calorie Needs",
+    "Meal Plan Generator",
+    "Health Metrics",
+    "Meal Tracking",
+    "Water",
+    "Weight",
+    "Streaks",
+    "Assistant",
+    "Smart Swap",
+]
 # Persist active tab across refreshes using query params + session_state.
 if 'active_tab' not in st.session_state:
     st.session_state.active_tab = 1
@@ -327,7 +336,9 @@ except Exception:
 
 
 # Map to original variable names to avoid changing UI logic.
-(tab1, tab2, tab3, tab4, tab5, tab6, tab7) = tabs
+(tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8, tab9) = tabs
+
+
 
 # Use Streamlit tab context managers (not active_tab_idx conditionals)
 with tab1:
@@ -627,144 +638,8 @@ with tab4:
     # Meal type selector
     meal_type = st.selectbox("Meal Type", ["Breakfast", "Lunch", "Dinner", "Snack"])
 
-    # Optional: Upload food image (Gemini Vision)
-    with st.container():
-        st.subheader("Upload Food Image (optional)")
-
-        if 'detected_meal_result' not in st.session_state:
-            st.session_state.detected_meal_result = None
-        if 'detected_meal_error' not in st.session_state:
-            st.session_state.detected_meal_error = None
-        if 'detected_meal_loading' not in st.session_state:
-            st.session_state.detected_meal_loading = False
-
-        uploaded_file = st.file_uploader(
-            "Upload Food Image",
-            type=["jpg", "png", "jpeg"],
-            key="meal_image_uploader"
-        )
-
-        # Analyze image
-        if uploaded_file is not None:
-            if st.button("Analyze Image", key="analyze_image_btn"):
-                # Reset state for fresh analysis
-                st.session_state.detected_meal_result = None
-                st.session_state.detected_meal_error = None
-
-                image_bytes = uploaded_file.getvalue()
-                mime_type = getattr(uploaded_file, "type", None) or "image/jpeg"
-
-                from utils.gemini_food_recognition import detect_food_from_image
-
-                st.session_state.detected_meal_loading = True
-                with st.spinner("Analyzing food image with Gemini Vision..."):
-                    try:
-                        result = detect_food_from_image(
-                            image_bytes=image_bytes,
-                            mime_type=mime_type,
-                            nutrition_df=nutrition_df,
-                        )
-                        if not result.ok:
-                            st.session_state.detected_meal_result = None
-                            st.session_state.detected_meal_error = result.error or "Image analysis failed."
-                        else:
-                            st.session_state.detected_meal_result = result
-                            st.session_state.detected_meal_error = None
-                    except Exception as e:
-                        st.session_state.detected_meal_result = None
-                        st.session_state.detected_meal_error = str(e)
-                    finally:
-                        st.session_state.detected_meal_loading = False
-
-        # Render detected nutrition card
-        if st.session_state.detected_meal_loading:
-            st.info("Processing image...")
-
-        if st.session_state.detected_meal_error:
-            st.error(st.session_state.detected_meal_error)
-
-        if st.session_state.detected_meal_result and st.session_state.detected_meal_result.ok:
-            r = st.session_state.detected_meal_result
-            matched_food = r.matched_food_name or r.food_name
-            display_amt = r.matched_display_amount if r.matched_display_amount is not None else r.quantity
-            display_unit = r.matched_display_unit or r.unit or "g"
-
-            st.markdown(
-                """
-                <div class="metric-card" style="text-align:left;">
-                    <h4 style="margin:0 0 10px 0;">Detected Nutrition</h4>
-                    <div style="color:#0c4a6e; font-size:0.95em;">
-                """,
-                unsafe_allow_html=True,
-            )
-            st.markdown(
-                f"<div style='margin-bottom:10px;'><strong>Food:</strong> {matched_food or 'Unknown'}</div>",
-                unsafe_allow_html=True,
-            )
-            if display_amt is not None:
-                st.markdown(
-                    f"<div style='margin-bottom:10px;'><strong>Serving:</strong> {display_amt} {display_unit}</div>",
-                    unsafe_allow_html=True,
-                )
-            if r.category:
-                st.markdown(
-                    f"<div style='margin-bottom:10px;'><strong>Category:</strong> {r.category}</div>",
-                    unsafe_allow_html=True,
-                )
-
-            st.markdown(
-                """
-                    <div style="display:flex; gap:16px; flex-wrap:wrap;">
-                """,
-                unsafe_allow_html=True,
-            )
-            c1, c2, c3, c4 = st.columns(4)
-            c1.metric("Calories", f"{(r.calories or 0):.0f} kcal")
-            c2.metric("Protein", f"{(r.protein or 0):.1f} g")
-            c3.metric("Carbs", f"{(r.carbs or 0):.1f} g")
-            c4.metric("Fat", f"{(r.fat or 0):.1f} g")
-
-            st.markdown("</div>", unsafe_allow_html=True)
-
-            if r.matched_food_name:
-                if st.button("Add Detected Meal", key="add_detected_meal_btn"):
-                    try:
-                        date_str = selected_date.strftime('%Y-%m-%d')
-                        if date_str not in st.session_state.daily_log:
-                            st.session_state.daily_log[date_str] = []
-
-                        # Decide display amount/unit for Amount field
-                        if r.matched_display_amount is not None and r.matched_display_unit:
-                            amount_field = f"{r.matched_display_amount} {r.matched_display_unit}"
-                        else:
-                            amount_field = f"{r.quantity if r.quantity is not None else 1.0} {r.unit or 'g'}"
-
-                        meal_entry = {
-                            'Date': date_str,
-                            'Meal_Type': meal_type,
-                            'Food': str(r.matched_food_name),
-                            'Amount': amount_field,
-                            'Calories': float(r.calories or 0),
-                            'Protein': float(r.protein or 0),
-                            'Carbs': float(r.carbs or 0),
-                            'Fat': float(r.fat or 0),
-                        }
-
-                        st.session_state.daily_log[date_str].append(meal_entry)
-                        st.success(
-                            f"Added detected meal to {meal_type} for {selected_date.strftime('%B %d, %Y')}"
-                        )
-
-                        # Clear detection to avoid accidental duplicates on reruns
-                        st.session_state.detected_meal_result = None
-                        st.session_state.detected_meal_error = None
-
-                    except Exception as e:
-                        st.error(f"Error adding detected meal: {e}")
-            else:
-                st.warning("Could not match detected food to the nutrition database. Try manual selection.")
-
     # Food selector
+
     if not nutrition_df.empty:
         food_options = [""] + nutrition_df.index.tolist()
         selected_food = st.selectbox("Select Food", food_options)
@@ -912,5 +787,15 @@ with tab6:
 
 with tab7:
     streaks_tab()
+
+with tab8:
+    from utils.nutrition_assistant import assistant_tab_ui
+    assistant_tab_ui(nutrition_df=nutrition_df, veg_pref=food_preference, allergies=allergies)
+
+with tab9:
+    from utils.smart_swap import smart_swap_tab_ui
+    smart_swap_tab_ui(nutrition_df=nutrition_df, food_preference=food_preference, allergies=allergies)
+
+
 
 

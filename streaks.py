@@ -6,7 +6,7 @@ import calendar
 
 
 def streaks_tab():
-    st.header("🔥 Streaks & Meal Logging Heatmap")
+    st.header("Streaks & Meal Logging")
 
     if not st.session_state.daily_log:
         st.info("Start logging meals to build your streaks!")
@@ -26,7 +26,7 @@ def streaks_tab():
         st.metric("Total Logged Days", total_logged_days)
 
     # Streak heatmap
-    st.subheader("📅 Meal Logging Activity (GitHub-style Heatmap)")
+    st.subheader("Meal Logging Activity ")
     heatmap_fig = create_streak_heatmap(streak_data)
     if heatmap_fig:
         st.plotly_chart(heatmap_fig, use_container_width=True)
@@ -34,7 +34,7 @@ def streaks_tab():
         st.info("Not enough data to render the heatmap. Keep logging meals!")
 
     # Streak history - last 30 days with improved layout
-    st.subheader("📋 Recent Activity (Last 30 Days)")
+    st.subheader("Recent Activity (Last 30 Days)")
     if streak_data:
         # Sort by date descending
         sorted_dates = sorted(streak_data.items(), key=lambda x: x[0], reverse=True)

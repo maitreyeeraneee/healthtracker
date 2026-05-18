@@ -23,11 +23,7 @@ from .ui_components import (
     create_daily_calorie_bar_chart, create_meal_wise_macro_bar_chart
 )
 
-# From gemini_food_recognition.py
-from .gemini_food_recognition import (
-    detect_food_from_image,
-    DetectedFoodResult,
-)
+
 
 # From utils.py (analytics functions)
 from .analytics import (
@@ -40,6 +36,7 @@ from .analytics import (
 
 # Make all functions available at package level
 __all__ = [
+
     # data_loader functions
     'load_db', 'search_food_case_insensitive', 'convert_units_to_grams',
     'get_display_amount_and_unit', 'calculate_nutrition_per_serving',
@@ -47,10 +44,8 @@ __all__ = [
     'aggregate_historical_data', 'aggregate_meal_wise_data',
     'get_smart_units',
 
-    # gemini food recognition
-    'detect_food_from_image', 'DetectedFoodResult',
-
     # meal_generator functions
+
     'calculate_bmr_tdee', 'calculate_macros', 'filter_foods_by_preferences',
     'generate_smart_swaps', 'filter_meals', 'build_week', 'build_day',
 
