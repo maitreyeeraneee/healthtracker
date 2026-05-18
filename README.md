@@ -1,7 +1,7 @@
 <!--
 ╔══════════════════════════════════════════════════════════════════════════════╗
 ║                                                                              ║
-║                              🏃‍♂️ HealthTracker                                ║
+║                               🌌 NutriVerse                                    ║
 ║                    Professional Health Tracking Application                  ║
 ║                                                                              ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
@@ -24,7 +24,7 @@
 
 <br/>
 
-# 🏃‍♂️ HealthTracker
+# 🌌 NutriVerse
 
 ### Your Personal AI-Powered Health & Nutrition Companion
 
@@ -47,7 +47,7 @@ live link - https://healthtracking.streamlit.app/
 
 ## 📖 Overview
 
-HealthTracker is a powerful, interactive health and nutrition tracking application built with **Python** and **Streamlit**. It helps users monitor daily health metrics, generate personalized meal plans using optimization algorithms, and track their fitness progress over time with beautiful visualizations.
+NutriVerse is a powerful, interactive health and nutrition tracking application built with **Python** and **Streamlit**. It helps users monitor daily health metrics, generate personalized meal plans using intelligent algorithms, and track their fitness progress over time with beautiful visualizations.
 
 ### 🎯 What It Does
 
@@ -129,8 +129,8 @@ This project showcases proficiency in:
 
 ```bash
 # STEP 1: Clone the Repository
-git clone https://github.com/Maitreyee/HealthTracker.git
-cd HealthTracker
+git clone https://github.com/Maitreyee/NutriVerse.git
+cd NutriVerse
 
 # STEP 2: Create Virtual Environment
 python -m venv venv
@@ -174,7 +174,7 @@ The application will open in your browser at **`http://localhost:8501`**
 ## 📂 Project Structure
 
 ```
-HealthTracker/
+NutriVerse/
 │
 ├── app.py                      # Main Streamlit application
 ├── constants.py                # Configuration constants
@@ -188,7 +188,7 @@ HealthTracker/
 │   ├── __init__.py            # Package initialization
 │   ├── analytics.py           # Chart & visualization functions
 │   ├── data_loader.py         # Data loading utilities
-│   ├── meal_generator.py     # Meal plan generation logic
+│   ├── meal_generator.py      # Meal plan generation logic
 │   └── ui_components.py       # Reusable UI components
 │
 ├── water_tracker.py           # Water intake tracking
@@ -222,8 +222,8 @@ Contributions are welcome! Here's how you can help:
 # Click the "Fork" button on GitHub
 
 # 2. Clone your fork
-git clone https://github.com/YOUR_USERNAME/HealthTracker.git
-cd HealthTracker
+git clone https://github.com/YOUR_USERNAME/NutriVerse.git
+cd NutriVerse
 
 # 3. Create a feature branch
 git checkout -b feature/amazing-feature
@@ -275,4 +275,3 @@ git push origin feature/amazing-feature
 **Built with ❤️ using Python & Streamlit**
 
 </div>
-

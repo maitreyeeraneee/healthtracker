@@ -1085,24 +1085,37 @@ def enforce_max_repeats(food_history: List[str], max_repeats: int = 2) -> List[s
 
 
 def calculate_bmr_tdee(age, weight, height, gender, activity_level):
-    """Legacy function for compatibility."""
-    user = {
-        'age': age, 'sex': gender, 'weight': weight, 'height': height,
-        'activity_level': activity_level, 'goal': 'maintain'
-    }
-    daily_calories, _ = calculate_targets(user)
-    bmr, tdee = daily_calories - GOAL_ADJUSTMENTS['maintain'], daily_calories
+    """Calculate BMR and TDEE using Mifflin-St Jeor formula.
+    Returns (bmr, tdee) separately.
+    """
+    sex = gender.lower()
+    # Mifflin-St Jeor BMR
+    if sex == 'male':
+        bmr = 10 * weight + 6.25 * height - 5 * age + 5
+    else:
+        bmr = 10 * weight + 6.25 * height - 5 * age - 161
+    
+    activity_level_lower = activity_level.lower()
+    activity_factor = ACTIVITY_MULTIPLIERS.get(activity_level_lower, 1.2)
+    tdee = round(bmr * activity_factor, 1)
+    bmr = round(bmr, 1)
     return bmr, tdee
 
 
 def calculate_macros(calories, goal):
-    """Legacy function for compatibility."""
-    user = {'goal': goal}
-    _, macro_targets = calculate_targets({**user, 'age': 25, 'sex': 'male', 'weight': 70, 'height': 170, 'activity_level': 'moderately active'})
-    protein_pct = macro_targets['protein'] * 4 / calories
-    carbs_pct = macro_targets['carbs'] * 4 / calories
-    fat_pct = macro_targets['fat'] * 9 / calories
-    return protein_pct, carbs_pct, fat_pct, macro_targets['protein'], macro_targets['carbs'], macro_targets['fat']
+    """Calculate macro targets based on calories and goal.
+    
+    Uses goal-based macro ratios directly rather than hardcoded user values.
+    Returns (protein_pct, carbs_pct, fat_pct, protein_g, carbs_g, fat_g).
+    """
+    goal_lower = goal.lower() if goal else 'maintain'
+    ratios = MACRO_RATIOS.get(goal_lower, MACRO_RATIOS['maintain'])
+    
+    protein_g = (calories * ratios['protein']) / 4
+    carbs_g = (calories * ratios['carbs']) / 4
+    fat_g = (calories * ratios['fat']) / 9
+    
+    return ratios['protein'], ratios['carbs'], ratios['fat'], protein_g, carbs_g, fat_g
 
 
 def filter_foods_by_preferences(nutrition_df, food_preference, allergies, cuisine_preference=None):

@@ -23,11 +23,8 @@ from .ui_components import (
     create_daily_calorie_bar_chart, create_meal_wise_macro_bar_chart
 )
 
-
-
-# From utils.py (analytics functions)
+# From analytics.py
 from .analytics import (
-
     calculate_ideal_body_weight, calculate_body_fat_percentage,
     calculate_lean_body_mass, calculate_protein_target,
     calculate_daily_water_intake, calculate_calorie_balance,
@@ -36,7 +33,6 @@ from .analytics import (
 
 # Make all functions available at package level
 __all__ = [
-
     # data_loader functions
     'load_db', 'search_food_case_insensitive', 'convert_units_to_grams',
     'get_display_amount_and_unit', 'calculate_nutrition_per_serving',
@@ -45,7 +41,6 @@ __all__ = [
     'get_smart_units',
 
     # meal_generator functions
-
     'calculate_bmr_tdee', 'calculate_macros', 'filter_foods_by_preferences',
     'generate_smart_swaps', 'filter_meals', 'build_week', 'build_day',
 

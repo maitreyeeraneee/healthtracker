@@ -6,6 +6,7 @@ import plotly.graph_objects as go
 from datetime import datetime
 import ast
 import re
+import random
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -38,10 +39,11 @@ meal_tracking_df = None
 
 # Page configuration
 st.set_page_config(
-    page_title="Nutrition & Fitness Planner",
+    page_title="NutriVerse",
     layout="wide",
     initial_sidebar_state="expanded"
 )
+
 
 def load_data():
     """Load all necessary data files."""
@@ -207,7 +209,8 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # Main header
-st.markdown("<h1 style='text-align: center; color: #4CAF50;'>Nutrition & Fitness Planner</h1>", unsafe_allow_html=True)
+st.markdown("<h1 style='text-align: center; color: #4CAF50;'>NutriVerse</h1>", unsafe_allow_html=True)
+
 
 # Sidebar
 with st.sidebar:
@@ -504,7 +507,8 @@ with tab2:
                         for i, meal in enumerate(meals_of_type):
 
                             # Generate smart swaps for this food (respect dietary preferences)
-                            smart_swaps = generate_smart_swaps(meal['Food'], nutrition_df, food_preference, allergies=allergies)
+                            veg_flag = food_preference.lower() if food_preference != "None" else "none"
+                            smart_swaps = generate_smart_swaps(meal['Food'], nutrition_df, veg_flag, allergies=allergies)
 
 
                             col1, col2 = st.columns([3, 1])
