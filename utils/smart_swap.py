@@ -370,14 +370,33 @@ def suggest_swaps(
 
 def smart_swap_tab_ui(nutrition_df: pd.DataFrame, food_preference: str, allergies: str):
     """Streamlit UI for Smart Swap tab."""
-    st.subheader("Smart Swap")
-    st.caption("Enter a food. Get healthier replacements with dataset-grounded reasons.")
+    # Modern header with icon
+    st.markdown("""
+    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 24px;">
+        <div style="background: linear-gradient(135deg, #f59e0b 0%, #f97316 100%); 
+                    width: 48px; height: 48px; border-radius: 12px; 
+                    display: flex; align-items: center; justify-content: center;">
+            <span style="font-size: 24px;">🔄</span>
+        </div>
+        <div>
+            <h2 style="margin: 0; color: #1f2937;">Smart Swap</h2>
+            <p style="margin: 0; color: #6b7280; font-size: 0.9rem;">Find healthier alternatives for your meals</p>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
     if nutrition_df is None or nutrition_df.empty:
         st.warning("Nutrition dataset is unavailable.")
         return
 
     veg_pref = food_preference.lower() if food_preference in {"Vegetarian", "Vegan"} else "none"
+
+    # Input section with card styling
+    st.markdown("""
+    <div class="card-container">
+        <h4 style="margin-top: 0; color: #1f2937;">Select a Food to Swap</h4>
+    </div>
+    """, unsafe_allow_html=True)
 
     food_options = list(nutrition_df.index.astype(str))
     q = st.selectbox(
@@ -386,33 +405,109 @@ def smart_swap_tab_ui(nutrition_df: pd.DataFrame, food_preference: str, allergie
         index=0 if food_options else 0,
         key="smart_swap_select",
         format_func=lambda x: str(x),
+        help="Choose a food you want to find healthier alternatives for"
     )
 
-    max_results = st.slider("Number of recommendations", 3, 10, 5, step=1, key="smart_swap_k")
+    max_results = st.slider(
+        "Number of recommendations", 
+        min_value=3, 
+        max_value=10, 
+        value=5, 
+        step=1, 
+        key="smart_swap_k",
+        help="How many swap suggestions would you like to see?"
+    )
 
-    if st.button("Find swaps", key="smart_swap_btn"):
+    if st.button("🔍 Find Healthier Swaps", key="smart_swap_btn", use_container_width=True):
         swaps = suggest_swaps(q, nutrition_df, veg_pref=veg_pref, allergies=allergies, max_results=max_results)
 
         if not swaps:
-            st.info("No swaps found for the given input with your filters.")
+            st.markdown("""
+            <div style="text-align: center; padding: 40px 20px; color: #6b7280;">
+                <div style="font-size: 48px; margin-bottom: 16px;">🔍</div>
+                <p style="font-size: 1.1rem;">No swaps found for this food with your filters.</p>
+                <p style="font-size: 0.9rem;">Try adjusting your dietary preferences or choosing a different food.</p>
+            </div>
+            """, unsafe_allow_html=True)
             return
 
-        for s in swaps:
-            header = f"{s['from']} → {s['to']}"
-            st.markdown(f"### {header}")
-            metrics_parts = [
-                f"{s['kcal']:.0f} kcal/100g",
-                f"{s['protein']:.1f}g protein",
-                f"{s['carbs']:.1f}g carbs",
-                f"{s['fat']:.1f}g fat",
-            ]
-            if s.get("fiber") is not None:
-                metrics_parts.append(f"{s['fiber']:.1f}g fiber")
-            st.caption(", ".join(metrics_parts))
+        # Results section
+        st.markdown("<div style='margin-top: 32px;'></div>", unsafe_allow_html=True)
+        st.markdown(f"""
+        <div class="card-container">
+            <h4 style="margin-top: 0; color: #1f2937;">✨ Found {len(swaps)} Healthier Alternatives</h4>
+        </div>
+        """, unsafe_allow_html=True)
+
+        for i, s in enumerate(swaps):
+            # Calculate improvements
+            kcal_diff = s['kcal'] - float(nutrition_df.loc[s['from'], 'kcal']) if s['from'] in nutrition_df.index else 0
+            protein_diff = s['protein'] - float(nutrition_df.loc[s['from'], 'protein']) if s['from'] in nutrition_df.index else 0
+            
+            # Card for each swap suggestion
+            st.markdown(f"""
+            <div class="meal-item" style="margin: 16px 0; padding: 20px 24px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                    <div>
+                        <span style="color: #6b7280; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em;">Suggestion {i+1}</span>
+                        <div style="font-size: 1.25rem; font-weight: 600; color: #1f2937; margin-top: 4px;">
+                            {s['from']} <span style="color: #10b981;">→</span> <span style="color: #10b981;">{s['to']}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
+            
+            # Nutrition comparison cards
+            cols = st.columns(4)
+            with cols[0]:
+                kcal_color = '#10b981' if kcal_diff < 0 else '#ef4444' if kcal_diff > 0 else '#6b7280'
+                kcal_arrow = '↓' if kcal_diff < 0 else '↑' if kcal_diff > 0 else '='
+                st.markdown(f"""
+                <div class="nutrition-badge" style="text-align: center; padding: 12px; background: {'#f0fdf4' if kcal_diff < 0 else '#fef2f2' if kcal_diff > 0 else '#f9fafb'};">
+                    <div style="font-size: 1.25rem; font-weight: 700; color: {kcal_color};">{s['kcal']:.0f}</div>
+                    <div style="font-size: 0.75rem; color: #6b7280; margin-top: 4px;">kcal/100g</div>
+                    <div style="font-size: 0.7rem; color: {kcal_color}; margin-top: 2px;">{kcal_arrow} {abs(kcal_diff):.0f}</div>
+                </div>
+                """, unsafe_allow_html=True)
+            with cols[1]:
+                protein_color = '#10b981' if protein_diff > 0 else '#ef4444' if protein_diff < 0 else '#6b7280'
+                protein_arrow = '↑' if protein_diff > 0 else '↓' if protein_diff < 0 else '='
+                st.markdown(f"""
+                <div class="nutrition-badge" style="text-align: center; padding: 12px; background: {'#f0fdf4' if protein_diff > 0 else '#fef2f2' if protein_diff < 0 else '#f9fafb'};">
+                    <div style="font-size: 1.25rem; font-weight: 700; color: {protein_color};">{s['protein']:.1f}</div>
+                    <div style="font-size: 0.75rem; color: #6b7280; margin-top: 4px;">g protein</div>
+                    <div style="font-size: 0.7rem; color: {protein_color}; margin-top: 2px;">{protein_arrow} {abs(protein_diff):.1f}</div>
+                </div>
+                """, unsafe_allow_html=True)
+            with cols[2]:
+                st.markdown(f"""
+                <div class="nutrition-badge" style="text-align: center; padding: 12px;">
+                    <div style="font-size: 1.25rem; font-weight: 700; color: #f59e0b;">{s['carbs']:.1f}</div>
+                    <div style="font-size: 0.75rem; color: #6b7280; margin-top: 4px;">g carbs</div>
+                </div>
+                """, unsafe_allow_html=True)
+            with cols[3]:
+                st.markdown(f"""
+                <div class="nutrition-badge" style="text-align: center; padding: 12px;">
+                    <div style="font-size: 1.25rem; font-weight: 700; color: #ef4444;">{s['fat']:.1f}</div>
+                    <div style="font-size: 0.75rem; color: #6b7280; margin-top: 4px;">g fat</div>
+                </div>
+                """, unsafe_allow_html=True)
+
+            # Reasons section
             if s.get("reasons"):
-                st.write("Reasons:")
+                st.markdown("<div style='margin: 16px 0 8px;'></div>", unsafe_allow_html=True)
+                st.markdown("**Why this swap is better:**")
                 for r in s["reasons"]:
-                    st.markdown(f"- {r}")
-            st.divider()
+                    st.markdown(f"""
+                    <div style="display: flex; align-items: flex-start; gap: 8px; margin: 6px 0; padding: 8px 12px; 
+                                background: #f0fdf4; border-radius: 8px; border-left: 3px solid #10b981;">
+                        <span style="color: #10b981; font-size: 1rem;">✓</span>
+                        <span style="color: #374151; font-size: 0.9rem;">{r}</span>
+                    </div>
+                    """, unsafe_allow_html=True)
+            
+            st.markdown("<div class='section-divider' style='margin: 24px 0;'></div>", unsafe_allow_html=True)
 
 

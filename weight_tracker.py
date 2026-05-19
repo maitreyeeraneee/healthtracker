@@ -395,20 +395,56 @@ def create_weight_prediction_chart(prediction):
 
 
 def weight_tracker_tab():
-    st.header("⚖️ Weight Tracking")
+    # Modern header with icon
+    st.markdown("""
+    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 24px;">
+        <div style="background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%); 
+                    width: 48px; height: 48px; border-radius: 12px; 
+                    display: flex; align-items: center; justify-content: center;">
+            <span style="font-size: 24px;">⚖️</span>
+        </div>
+        <div>
+            <h2 style="margin: 0; color: #1f2937;">Weight Tracking</h2>
+            <p style="margin: 0; color: #6b7280; font-size: 0.9rem;">Monitor your weight journey</p>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
     if not st.session_state.metrics_calculated:
         st.info("Please calculate your needs in the sidebar to see weight tracking.")
         return
 
-    # Current metrics
-    col1, col2, col3 = st.columns(3)
-    with col1:
-        st.metric("Current Weight", f"{st.session_state.get('current_weight', 'N/A')} kg")
-    with col2:
-        st.metric("Ideal Body Weight", f"{st.session_state.ideal_weight:.1f} kg")
-    with col3:
-        st.metric("Target Weight", f"{st.session_state.get('target_weight', st.session_state.ideal_weight):.1f} kg")
+    # Current metrics with modern cards
+    st.markdown("""
+    <div class="card-container">
+        <h4 style="margin-top: 0; color: #1f2937;">Current Metrics</h4>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    metric_cols = st.columns(3)
+    with metric_cols[0]:
+        current_w = st.session_state.get('current_weight', st.session_state.get('weight', 'N/A'))
+        st.markdown(f"""
+        <div class="stat-item" style="border-top: 3px solid #8b5cf6;">
+            <div class="stat-value" style="color: #8b5cf6;">{current_w}</div>
+            <div class="stat-label">Current Weight (kg)</div>
+        </div>
+        """, unsafe_allow_html=True)
+    with metric_cols[1]:
+        st.markdown(f"""
+        <div class="stat-item" style="border-top: 3px solid #10b981;">
+            <div class="stat-value" style="color: #10b981;">{st.session_state.ideal_weight:.1f}</div>
+            <div class="stat-label">Ideal Weight (kg)</div>
+        </div>
+        """, unsafe_allow_html=True)
+    with metric_cols[2]:
+        target_w = st.session_state.get('target_weight', st.session_state.ideal_weight)
+        st.markdown(f"""
+        <div class="stat-item" style="border-top: 3px solid #f59e0b;">
+            <div class="stat-value" style="color: #f59e0b;">{target_w:.1f}</div>
+            <div class="stat-label">Target Weight (kg)</div>
+        </div>
+        """, unsafe_allow_html=True)
 
     # Initialize weight log if not exists
     if 'weight_log' not in st.session_state:
@@ -417,7 +453,12 @@ def weight_tracker_tab():
     col1, col2 = st.columns([1, 2])
 
     with col1:
-        st.subheader("Log Weight")
+        # Log weight card
+        st.markdown("""
+        <div class="card-container">
+            <h4 style="margin-top: 0; color: #1f2937;">Log Weight</h4>
+        </div>
+        """, unsafe_allow_html=True)
 
         weight_default = st.session_state.get('current_weight', 70.0)
         if not weight_default or weight_default <= 0:
@@ -431,11 +472,18 @@ def weight_tracker_tab():
         )
         date = st.date_input("Date", datetime.now().date(), key="weight_date_tracker")
 
-        if st.button("Log Weight"):
+        if st.button("Log Weight", use_container_width=True):
             log_weight(weight, date)
 
-        # Set target weight
-        st.subheader("Set Target Weight")
+        st.markdown("<div style='margin: 20px 0;'></div>", unsafe_allow_html=True)
+
+        # Set target weight card
+        st.markdown("""
+        <div class="card-container">
+            <h4 style="margin-top: 0; color: #1f2937;">Set Target</h4>
+        </div>
+        """, unsafe_allow_html=True)
+        
         target_default = st.session_state.get('target_weight', st.session_state.ideal_weight)
         target_weight = st.number_input(
             "Target Weight (kg)",
@@ -445,12 +493,18 @@ def weight_tracker_tab():
             key="target_weight_input_tracker",
         )
 
-        if st.button("Set Target"):
+        if st.button("Set Target", use_container_width=True):
             st.session_state.target_weight = target_weight
             st.success(f"Target weight set to {target_weight} kg")
 
     with col2:
-        # Weight history chart
+        # Weight history chart card
+        st.markdown("""
+        <div class="card-container">
+            <h4 style="margin-top: 0; color: #1f2937;">Weight History</h4>
+        </div>
+        """, unsafe_allow_html=True)
+        
         if st.session_state.weight_log:
             df = pd.DataFrame(list(st.session_state.weight_log.items()), columns=['Date', 'Weight'])
             df['Date'] = pd.to_datetime(df['Date'])
@@ -459,16 +513,16 @@ def weight_tracker_tab():
             # Update current weight
             st.session_state.current_weight = float(df['Weight'].iloc[-1])
 
-            # Enhanced line chart with target line
+            # Enhanced line chart with modern styling
             fig = go.Figure()
             
-            # Main weight trace
+            # Main weight trace with gradient effect
             fig.add_trace(go.Scatter(
                 x=df['Date'], y=df['Weight'],
                 mode='lines+markers',
                 name='Weight',
-                line=dict(color='#10b981', width=2.5),
-                marker=dict(size=8, color='#10b981'),
+                line=dict(color='#8b5cf6', width=3),
+                marker=dict(size=8, color='#8b5cf6', line=dict(width=2, color='white')),
                 hovertemplate='%{x|%b %d, %Y}<br>Weight: %{y:.1f} kg<extra></extra>',
             ))
             
@@ -477,10 +531,11 @@ def weight_tracker_tab():
             fig.add_hline(
                 y=target,
                 line_dash="dash",
-                line_color="#ef4444",
-                annotation_text=f"Target: {target:.1f} kg",
+                line_color="#f59e0b",
+                annotation_text=f"🎯 Target: {target:.1f} kg",
                 annotation_position="right",
                 line_width=2,
+                annotation_font=dict(color="#f59e0b", size=11),
             )
             
             # Ideal weight line
@@ -489,10 +544,11 @@ def weight_tracker_tab():
                 fig.add_hline(
                     y=ideal,
                     line_dash="dot",
-                    line_color="#8b5cf6",
-                    annotation_text=f"Ideal: {ideal:.1f} kg",
+                    line_color="#10b981",
+                    annotation_text=f"⭐ Ideal: {ideal:.1f} kg",
                     annotation_position="left",
                     line_width=1.5,
+                    annotation_font=dict(color="#10b981", size=10),
                 )
 
             # Fit polynomial trendline
@@ -512,7 +568,7 @@ def weight_tracker_tab():
 
             fig.update_layout(
                 title=dict(
-                    text="Weight Change Over Time",
+                    text="Weight Progress Over Time",
                     font=dict(size=14, color='#1f2937'),
                 ),
                 xaxis_title="Date",
@@ -527,17 +583,36 @@ def weight_tracker_tab():
                     y=1.02,
                     xanchor="right",
                     x=1,
+                    font=dict(size=10),
                 ),
+                xaxis=dict(
+                    showgrid=True,
+                    gridcolor='#f3f4f6',
+                    gridwidth=1,
+                ),
+                yaxis=dict(
+                    showgrid=True,
+                    gridcolor='#f3f4f6',
+                    gridwidth=1,
+                    zeroline=False,
+                ),
+                plot_bgcolor='white',
+                paper_bgcolor='white',
             )
             st.plotly_chart(fig, use_container_width=True)
 
-            # Weight change stats in a clean row
+            # Weight change stats with modern cards
+            st.markdown("<div style='margin-top: 24px;'></div>", unsafe_allow_html=True)
             stats_cols = st.columns(4)
             if len(df) > 1:
                 initial_weight = float(df['Weight'].iloc[0])
                 current_weight_val = float(df['Weight'].iloc[-1])
                 change = current_weight_val - initial_weight
-                stats_cols[0].metric("Total Change", f"{change:+.1f} kg", f"From {initial_weight:.1f} kg")
+                stats_cols[0].metric(
+                    "Total Change", 
+                    f"{change:+.1f} kg", 
+                    f"From {initial_weight:.1f} kg"
+                )
 
                 # Weekly trend
                 df['week'] = df['Date'].dt.to_period('W')
@@ -545,9 +620,9 @@ def weight_tracker_tab():
                 weekly_avg['week'] = weekly_avg['week'].astype(str)
                 if len(weekly_avg) > 1:
                     weekly_change = weekly_avg['Weight'].iloc[-1] - weekly_avg['Weight'].iloc[-2]
-                    stats_cols[1].metric("Weekly Trend", f"{weekly_change:+.2f} kg/week")
+                    stats_cols[1].metric("Weekly Trend", f"{weekly_change:+.2f} kg", "per week")
                 else:
-                    stats_cols[1].metric("Weekly Trend", "N/A")
+                    stats_cols[1].metric("Weekly Trend", "N/A", "Need more data")
 
                 # Monthly trend
                 df['month'] = df['Date'].dt.to_period('M')
@@ -555,19 +630,26 @@ def weight_tracker_tab():
                 monthly_avg['month'] = monthly_avg['month'].astype(str)
                 if len(monthly_avg) > 1:
                     monthly_change = monthly_avg['Weight'].iloc[-1] - monthly_avg['Weight'].iloc[-2]
-                    stats_cols[2].metric("Monthly Trend", f"{monthly_change:+.2f} kg/month")
+                    stats_cols[2].metric("Monthly Trend", f"{monthly_change:+.2f} kg", "per month")
                 else:
-                    stats_cols[2].metric("Monthly Trend", "N/A")
+                    stats_cols[2].metric("Monthly Trend", "N/A", "Need more data")
 
                 # Rate of change
                 days_elapsed = (df['Date'].iloc[-1] - df['Date'].iloc[0]).days
                 if days_elapsed > 0:
                     daily_rate = change / days_elapsed
-                    stats_cols[3].metric("Daily Rate", f"{daily_rate:+.3f} kg/day")
+                    stats_cols[3].metric("Daily Rate", f"{daily_rate:+.3f} kg", "per day")
                 else:
-                    stats_cols[3].metric("Daily Rate", "N/A")
+                    stats_cols[3].metric("Daily Rate", "N/A", "Single entry")
         else:
-            st.info("No weight data logged yet. Start logging your weight to see charts!")
+            # Empty state
+            st.markdown("""
+            <div style="text-align: center; padding: 60px 20px; color: #6b7280;">
+                <div style="font-size: 64px; margin-bottom: 16px;">⚖️</div>
+                <p style="font-size: 1.1rem; margin-bottom: 8px;">No weight data logged yet</p>
+                <p style="font-size: 0.9rem;">Start tracking your weight to see progress charts</p>
+            </div>
+            """, unsafe_allow_html=True)
 
     # --- Enhanced AI Weight Prediction Section ---
     st.markdown("---")

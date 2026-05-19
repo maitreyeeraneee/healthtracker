@@ -95,121 +95,452 @@ if 'show_plan_types' not in st.session_state:
 # Load data
 nutrition_df, tips_df, daily_meals_df = load_data()
 
-# Custom CSS - Modern, subtle, clean design
+# Custom CSS - Modern, Premium, Clean Design System
 st.markdown("""
 <style>
-    /* Meal plan cards - subtle modern design */
-    .meal-plan-card {
-        background: #f8f9fa;
-        border-radius: 12px;
-        padding: 20px 25px;
-        margin: 12px 0;
-        border-left: 4px solid #10b981;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    /* ===== GLOBAL STYLES ===== */
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    
+    * {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     }
+    
+    /* Main container padding */
+    .main > div:first-child {
+        padding-top: 2rem !important;
+    }
+    
+    /* ===== TYPOGRAPHY ===== */
+    h1, h2, h3, h4, h5, h6 {
+        font-weight: 600 !important;
+        color: #1f2937 !important;
+        margin-bottom: 0.5em !important;
+    }
+    
+    h1 { font-size: 2.5rem; letter-spacing: -0.02em; }
+    h2 { font-size: 1.75rem; letter-spacing: -0.01em; }
+    h3 { font-size: 1.375rem; }
+    h4 { font-size: 1.125rem; }
+    
+    /* ===== SIDEBAR STYLING ===== */
+    #MainMenu {visibility: hidden;}
+    footer {visibility: hidden;}
+    header {visibility: hidden;}
+    
+    /* Sidebar container */
+    .css-1d391kg {
+        background-color: #f9fafb !important;
+        border-right: 1px solid #e5e7eb !important;
+    }
+    
+    /* Sidebar header */
+    .css-1d391kg .st-emotion-cache-16idsys {
+        color: #1f2937 !important;
+        font-weight: 600 !important;
+        font-size: 1.125rem !important;
+    }
+    
+    /* ===== METRIC CARDS ===== */
+    .metric-card {
+        background: white;
+        border-radius: 16px;
+        padding: 24px;
+        margin: 12px 0;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+        border: 1px solid #e5e7eb;
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .metric-card:hover {
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+        transform: translateY(-2px);
+        border-color: #10b981;
+    }
+    
+    .metric-card-value {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #1f2937;
+        line-height: 1.2;
+    }
+    
+    .metric-card-label {
+        font-size: 0.875rem;
+        color: #6b7280;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-top: 4px;
+    }
+    
+    /* ===== MEAL PLAN CARDS ===== */
+    .meal-plan-card {
+        background: white;
+        border-radius: 16px;
+        padding: 24px;
+        margin: 16px 0;
+        border-left: 4px solid #10b981;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        transition: all 0.25s ease;
+    }
+    
+    .meal-plan-card:hover {
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        transform: translateY(-1px);
+    }
+    
     .meal-plan-card h4 {
-        color: #374151;
-        font-size: 1.1em;
+        color: #1f2937;
+        font-size: 1.125rem;
         font-weight: 600;
         margin: 0 0 12px 0;
+        display: flex;
+        align-items: center;
+        gap: 8px;
     }
-    .meal-plan-card:hover {
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    }
-    /* Meal items - clean cards */
+    
+    /* ===== MEAL ITEMS ===== */
     .meal-item {
         background: white;
-        border-radius: 8px;
-        padding: 12px 15px;
-        margin: 6px 0;
-        color: #4b5563;
-        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-        border-left: 3px solid #d1d5db;
-        font-size: 0.95em;
+        border-radius: 12px;
+        padding: 16px 20px;
+        margin: 8px 0;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        border: 1px solid #e5e7eb;
+        transition: all 0.2s ease;
+        font-size: 0.95rem;
     }
+    
+    .meal-item:hover {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        border-color: #10b981;
+    }
+    
     .meal-item strong {
         color: #1f2937;
         font-weight: 600;
     }
-    /* Metric cards - subtle gradient */
-    .metric-card {
-        background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
-        border-radius: 12px;
-        padding: 18px 20px;
-        margin: 10px 0;
-        color: #0c4a6e;
-        text-align: center;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
-        border: 1px solid #bae6fd;
+    
+    .meal-nutrition {
+        display: inline-flex;
+        gap: 12px;
+        margin-top: 8px;
+        flex-wrap: wrap;
     }
-    .tab-content {
-        padding: 25px;
-        background: #f9fafb;
+    
+    .nutrition-badge {
+        background: #f3f4f6;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 500;
+        color: #4b5563;
+    }
+    
+    .nutrition-badge.calories { background: #fef3c7; color: #92400e; }
+    .nutrition-badge.protein { background: #dbeafe; color: #1e40af; }
+    .nutrition-badge.carbs { background: #fce7f3; color: #9d174d; }
+    .nutrition-badge.fat { background: #fee2e2; color: #991b1b; }
+    
+    /* ===== TABS STYLING ===== */
+    .stTabs [data-baseweb="tab-list"] {
+        gap: 2px;
+        background: #f3f4f6;
         border-radius: 12px;
-        margin: 15px 0;
+        padding: 4px;
+    }
+    
+    .stTabs [data-baseweb="tab"] {
+        border-radius: 8px;
+        padding: 10px 20px;
+        font-weight: 500;
+        font-size: 0.9rem;
+        color: #6b7280;
+        transition: all 0.2s ease;
+        border: none;
+        background: transparent;
+    }
+    
+    .stTabs [data-baseweb="tab"]:hover {
+        background: white;
+        color: #1f2937;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+    
+    .stTabs [data-baseweb="tab"][aria-selected="true"] {
+        background: white;
+        color: #10b981;
+        font-weight: 600;
+        box-shadow: 0 2px 8px rgba(16, 185, 129, 0.15);
+    }
+    
+    /* ===== BUTTONS ===== */
+    .stButton > button {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        padding: 10px 24px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        transition: all 0.25s ease;
+        box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+    }
+    
+    .stButton > button:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+    }
+    
+    .stButton > button:active {
+        transform: translateY(0);
+    }
+    
+    /* Secondary button */
+    .stButton > button[kind="secondary"] {
+        background: white;
+        color: #10b981;
+        border: 2px solid #10b981;
+        box-shadow: none;
+    }
+    
+    /* ===== INPUT FIELDS ===== */
+    .stNumberInput > div > div > input,
+    .stSelectbox > div > div > select,
+    .stTextInput > div > div > input {
+        border-radius: 10px;
+        border: 2px solid #e5e7eb;
+        padding: 10px 14px;
+        font-size: 0.95rem;
+        transition: all 0.2s ease;
+    }
+    
+    .stNumberInput > div > div > input:focus,
+    .stSelectbox > div > div > select:focus,
+    .stTextInput > div > div > input:focus {
+        border-color: #10b981;
+        box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+        outline: none;
+    }
+    
+    /* ===== PROGRESS BARS ===== */
+    .stProgress > div > div > div > div {
+        background: linear-gradient(90deg, #10b981 0%, #34d399 100%);
+        border-radius: 10px;
+    }
+    
+    .stProgress > div > div {
+        background: #e5e7eb;
+        border-radius: 10px;
+        height: 8px;
+    }
+    
+    /* ===== CARDS CONTAINER ===== */
+    .card-container {
+        background: white;
+        border-radius: 16px;
+        padding: 24px;
+        margin: 16px 0;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
         border: 1px solid #e5e7eb;
     }
-    .progress-bar {
-        height: 8px;
-        border-radius: 4px;
-        background: #e5e7eb;
-        overflow: hidden;
-        margin: 8px 0;
+    
+    /* ===== INFO/ALERT BOXES ===== */
+    .stInfo, .stWarning, .stError, .stSuccess {
+        border-radius: 12px;
+        border: none;
+        padding: 16px 20px;
+        margin: 12px 0;
     }
-    .progress-fill {
-        height: 100%;
-        background: linear-gradient(90deg, #10b981, #34d399);
-        transition: width 0.3s ease;
+    
+    .stInfo {
+        background: #eff6ff;
+        border-left: 4px solid #3b82f6;
     }
-    /* Smart swap button - subtle */
-    .smart-swap-btn {
-        background: #fef3c7;
-        color: #92400e;
-        border: 1px solid #fcd34d;
-        padding: 6px 12px;
-        border-radius: 6px;
-        cursor: pointer;
-        font-size: 0.85em;
-        margin-left: 8px;
-        transition: all 0.2s ease;
+    
+    .stWarning {
+        background: #fffbeb;
+        border-left: 4px solid #f59e0b;
     }
-    .smart-swap-btn:hover {
-        background: #fde68a;
-        border-color: #fbbf24;
+    
+    .stError {
+        background: #fef2f2;
+        border-left: 4px solid #ef4444;
     }
-    /* Plan option cards - clean */
+    
+    .stSuccess {
+        background: #f0fdf4;
+        border-left: 4px solid #10b981;
+    }
+    
+    /* ===== PLAN OPTION CARDS ===== */
     .plan-option-card {
         background: white;
-        border-radius: 12px;
-        padding: 18px 20px;
-        margin: 10px 0;
-        color: #4b5563;
-        cursor: pointer;
-        transition: all 0.2s ease;
+        border-radius: 16px;
+        padding: 20px 24px;
+        margin: 12px 0;
         border: 2px solid #e5e7eb;
+        cursor: pointer;
+        transition: all 0.25s ease;
     }
+    
     .plan-option-card:hover {
         border-color: #10b981;
-        box-shadow: 0 4px 6px rgba(16, 185, 129, 0.1);
+        box-shadow: 0 8px 25px rgba(16, 185, 129, 0.12);
+        transform: translateY(-2px);
     }
+    
+    .plan-option-card.selected {
+        border-color: #10b981;
+        background: #f0fdf4;
+    }
+    
     .plan-option-card h4 {
         color: #1f2937;
         font-weight: 600;
         margin: 0 0 8px 0;
     }
+    
+    /* ===== SMART SWAP BUTTON ===== */
+    .smart-swap-btn {
+        background: #fef3c7;
+        color: #92400e;
+        border: 1px solid #fcd34d;
+        padding: 8px 16px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 0.85rem;
+        font-weight: 500;
+        transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+    
+    .smart-swap-btn:hover {
+        background: #fde68a;
+        border-color: #fbbf24;
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(245, 158, 11, 0.2);
+    }
+    
+    /* ===== DASHBOARD CARDS ===== */
+    .dashboard-card {
+        background: white;
+        border-radius: 16px;
+        padding: 24px;
+        margin: 8px 0;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        border: 1px solid #e5e7eb;
+        transition: all 0.25s ease;
+    }
+    
+    .dashboard-card:hover {
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        transform: translateY(-2px);
+    }
+    
+    /* ===== SECTION DIVIDER ===== */
+    .section-divider {
+        height: 1px;
+        background: linear-gradient(90deg, transparent, #e5e7eb, transparent);
+        margin: 32px 0;
+        border: none;
+    }
+    
+    /* ===== RESPONSIVE DESIGN ===== */
     @media (max-width: 768px) {
-        .meal-plan-metrics {
-            flex-direction: column;
+        h1 { font-size: 2rem; }
+        h2 { font-size: 1.5rem; }
+        h3 { font-size: 1.25rem; }
+        
+        .meal-plan-card, .metric-card, .dashboard-card {
+            padding: 16px;
+            margin: 8px 0;
         }
-        .meal-plan-card, .metric-card {
-            padding: 15px;
+        
+        .stTabs [data-baseweb="tab"] {
+            padding: 8px 12px;
+            font-size: 0.8rem;
         }
+        
+        .metric-card-value {
+            font-size: 1.5rem;
+        }
+    }
+    
+    /* ===== ANIMATIONS ===== */
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .fade-in {
+        animation: fadeIn 0.4s ease-out;
+    }
+    
+    /* ===== CHART CONTAINERS ===== */
+    .chart-container {
+        background: white;
+        border-radius: 16px;
+        padding: 24px;
+        margin: 16px 0;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        border: 1px solid #e5e7eb;
+    }
+    
+    /* ===== STATS GRID ===== */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 16px;
+        margin: 20px 0;
+    }
+    
+    .stat-item {
+        background: white;
+        border-radius: 12px;
+        padding: 20px;
+        text-align: center;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+        border: 1px solid #e5e7eb;
+    }
+    
+    .stat-value {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: #1f2937;
+    }
+    
+    .stat-label {
+        font-size: 0.875rem;
+        color: #6b7280;
+        margin-top: 4px;
+        font-weight: 500;
     }
 </style>
 """, unsafe_allow_html=True)
 
-# Main header
-st.markdown("<h1 style='text-align: center; color: #4CAF50;'>NutriVerse</h1>", unsafe_allow_html=True)
+# Main header with modern styling
+st.markdown("""
+<div style="text-align: center; padding: 40px 20px 20px;">
+    <div style="display: inline-flex; align-items: center; gap: 16px; margin-bottom: 8px;">
+        <div style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); 
+                    width: 56px; height: 56px; border-radius: 16px; 
+                    display: flex; align-items: center; justify-content: center;
+                    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);">
+            <span style="font-size: 28px;">🥗</span>
+        </div>
+        <h1 style="margin: 0; font-size: 2.5rem; font-weight: 700; 
+                   background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+                   -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+                   background-clip: text;">NutriVerse</h1>
+    </div>
+    <p style="color: #6b7280; font-size: 1.1rem; margin: 0; font-weight: 400;">
+        Your Personal AI-Powered Nutrition & Health Companion
+    </p>
+</div>
+""", unsafe_allow_html=True)
 
 
 # Sidebar

@@ -6,27 +6,77 @@ import calendar
 
 
 def streaks_tab():
-    st.header("Streaks & Meal Logging")
+    # Modern header with icon
+    st.markdown("""
+    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 24px;">
+        <div style="background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%); 
+                    width: 48px; height: 48px; border-radius: 12px; 
+                    display: flex; align-items: center; justify-content: center;">
+            <span style="font-size: 24px;">🔥</span>
+        </div>
+        <div>
+            <h2 style="margin: 0; color: #1f2937;">Streaks & Consistency</h2>
+            <p style="margin: 0; color: #6b7280; font-size: 0.9rem;">Track your meal logging consistency</p>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
     if not st.session_state.daily_log:
-        st.info("Start logging meals to build your streaks!")
+        st.markdown("""
+        <div style="text-align: center; padding: 60px 20px; color: #6b7280;">
+            <div style="font-size: 64px; margin-bottom: 16px;">🔥</div>
+            <p style="font-size: 1.2rem; margin-bottom: 8px;">Start logging meals to build your streaks!</p>
+            <p style="font-size: 0.95rem;">Consistency is key to achieving your health goals.</p>
+        </div>
+        """, unsafe_allow_html=True)
         return
 
     # Calculate streaks
     current_streak, longest_streak, streak_data = calculate_streaks()
 
-    # Display streak metrics
-    col1, col2, col3 = st.columns(3)
-    with col1:
-        st.metric("Current Streak", f"{current_streak} days")
-    with col2:
-        st.metric("Longest Streak", f"{longest_streak} days")
-    with col3:
+    # Display streak metrics with modern cards
+    st.markdown("""
+    <div class="card-container">
+        <h4 style="margin-top: 0; color: #1f2937;">Your Streak Stats</h4>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    metric_cols = st.columns(3)
+    with metric_cols[0]:
+        color = '#10b981' if current_streak >= 7 else '#f59e0b' if current_streak >= 3 else '#6b7280'
+        st.markdown(f"""
+        <div class="stat-item" style="border-top: 3px solid {color};">
+            <div style="font-size: 48px; margin-bottom: 8px;">🔥</div>
+            <div class="stat-value" style="color: {color};">{current_streak}</div>
+            <div class="stat-label">Current Streak</div>
+        </div>
+        """, unsafe_allow_html=True)
+    with metric_cols[1]:
+        st.markdown(f"""
+        <div class="stat-item" style="border-top: 3px solid #3b82f6;">
+            <div style="font-size: 48px; margin-bottom: 8px;">🏆</div>
+            <div class="stat-value" style="color: #3b82f6;">{longest_streak}</div>
+            <div class="stat-label">Longest Streak</div>
+        </div>
+        """, unsafe_allow_html=True)
+    with metric_cols[2]:
         total_logged_days = sum(1 for v in streak_data.values() if v)
-        st.metric("Total Logged Days", total_logged_days)
+        st.markdown(f"""
+        <div class="stat-item" style="border-top: 3px solid #8b5cf6;">
+            <div style="font-size: 48px; margin-bottom: 8px;">📝</div>
+            <div class="stat-value" style="color: #8b5cf6;">{total_logged_days}</div>
+            <div class="stat-label">Total Logged Days</div>
+        </div>
+        """, unsafe_allow_html=True)
 
     # Streak heatmap
-    st.subheader("Meal Logging Activity ")
+    st.markdown("<div style='margin-top: 32px;'></div>", unsafe_allow_html=True)
+    st.markdown("""
+    <div class="card-container">
+        <h4 style="margin-top: 0; color: #1f2937;">📊 Meal Logging Activity</h4>
+    </div>
+    """, unsafe_allow_html=True)
+    
     heatmap_fig = create_streak_heatmap(streak_data)
     if heatmap_fig:
         st.plotly_chart(heatmap_fig, use_container_width=True)
@@ -34,42 +84,80 @@ def streaks_tab():
         st.info("Not enough data to render the heatmap. Keep logging meals!")
 
     # Streak history - last 30 days with improved layout
-    st.subheader("Recent Activity (Last 30 Days)")
+    st.markdown("<div style='margin-top: 32px;'></div>", unsafe_allow_html=True)
+    st.markdown("""
+    <div class="card-container">
+        <h4 style="margin-top: 0; color: #1f2937;">📅 Recent Activity (Last 30 Days)</h4>
+    </div>
+    """, unsafe_allow_html=True)
+    
     if streak_data:
         # Sort by date descending
         sorted_dates = sorted(streak_data.items(), key=lambda x: x[0], reverse=True)
         recent = sorted_dates[:30]
 
-        # Display as a clean table with columns
-        cols = st.columns(5)
+        # Display as a clean grid with modern styling
+        st.markdown("<div style='margin: 16px 0;'></div>", unsafe_allow_html=True)
+        cols = st.columns(6)
         for idx, (date_str, logged) in enumerate(recent):
-            col_idx = idx % 5
+            col_idx = idx % 6
             date_obj = datetime.strptime(date_str, '%Y-%m-%d')
             day_name = date_obj.strftime('%a')
             display = date_obj.strftime('%b %d')
-            status = "✅" if logged else "⬜"
+            
+            if logged:
+                status_icon = "✅"
+                bg_color = "#f0fdf4"
+                border_color = "#10b981"
+                text_color = "#10b981"
+            else:
+                status_icon = "⬜"
+                bg_color = "#f9fafb"
+                border_color = "#e5e7eb"
+                text_color = "#9ca3af"
+            
             with cols[col_idx]:
-                st.markdown(
-                    f"<div style='padding:4px;margin:2px;border-radius:4px;font-size:0.85em;"
-                    f"background-color:{'#d4edda' if logged else '#f8f9fa'};"
-                    f"border:1px solid {'#c3e6cb' if logged else '#dee2e6'};'>"
-                    f"<span style='font-weight:600;'>{day_name}</span> {display}<br>"
-                    f"<span style='font-size:1.2em;'>{status}</span>"
-                    f"</div>",
-                    unsafe_allow_html=True,
-                )
+                st.markdown(f"""
+                <div style="text-align: center; padding: 12px 8px; margin: 4px 0; 
+                            background-color: {bg_color}; border-radius: 10px;
+                            border: 2px solid {border_color}; transition: all 0.2s ease;">
+                    <div style="font-size: 0.75rem; color: {text_color}; font-weight: 500;">{day_name}</div>
+                    <div style="font-size: 0.85rem; color: #1f2937; font-weight: 600; margin: 4px 0;">{display}</div>
+                    <div style="font-size: 1.5rem;">{status_icon}</div>
+                </div>
+                """, unsafe_allow_html=True)
 
-        # Summary stats
-        st.markdown("---")
+        # Summary stats with modern cards
+        st.markdown("<div style='margin-top: 24px;'></div>", unsafe_allow_html=True)
         streak_summary_col1, streak_summary_col2, streak_summary_col3 = st.columns(3)
         with streak_summary_col1:
             logged_30 = sum(1 for d, v in sorted_dates[:30] if v)
-            st.metric("Logged in Last 30 Days", f"{logged_30}/30", f"{logged_30/30*100:.0f}%")
+            rate = f"{logged_30/30*100:.0f}%"
+            st.markdown(f"""
+            <div class="stat-item" style="border-top: 3px solid #10b981;">
+                <div class="stat-value" style="color: #10b981;">{logged_30}/30</div>
+                <div class="stat-label">Days Logged</div>
+                <div style="font-size: 0.8rem; color: #6b7280; margin-top: 4px;">{rate} success rate</div>
+            </div>
+            """, unsafe_allow_html=True)
         with streak_summary_col2:
             missed_30 = 30 - logged_30
-            st.metric("Missed Days", f"{missed_30}")
+            st.markdown(f"""
+            <div class="stat-item" style="border-top: 3px solid #f59e0b;">
+                <div class="stat-value" style="color: #f59e0b;">{missed_30}</div>
+                <div class="stat-label">Days Missed</div>
+                <div style="font-size: 0.8rem; color: #6b7280; margin-top: 4px;">Keep going!</div>
+            </div>
+            """, unsafe_allow_html=True)
         with streak_summary_col3:
-            st.metric("Logging Rate", f"{logged_30/30*100:.0f}%" if logged_30 > 0 else "0%")
+            consistency_rate = f"{logged_30/30*100:.0f}%" if logged_30 > 0 else "0%"
+            st.markdown(f"""
+            <div class="stat-item" style="border-top: 3px solid #3b82f6;">
+                <div class="stat-value" style="color: #3b82f6;">{consistency_rate}</div>
+                <div class="stat-label">Consistency</div>
+                <div style="font-size: 0.8rem; color: #6b7280; margin-top: 4px;">30-day average</div>
+            </div>
+            """, unsafe_allow_html=True)
 
 
 def calculate_streaks():
