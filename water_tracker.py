@@ -3,6 +3,7 @@ import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 from datetime import datetime, timedelta
+from utils.supabase_client import insert_row
 
 def water_tracker_tab():
     # Modern header with icon
@@ -295,12 +296,18 @@ def water_tracker_tab():
                 st.plotly_chart(fig_monthly, use_container_width=True)
 
 def add_water_intake(amount):
-    today = datetime.now().date().strftime('%Y-%m-%d')
+    now = datetime.now()
+    today = now.date().strftime('%Y-%m-%d')
     if today not in st.session_state.water_log:
         st.session_state.water_log[today] = []
     st.session_state.water_log[today].append({
-        'time': datetime.now().strftime('%H:%M'),
+        'time': now.strftime('%H:%M'),
         'amount': amount
+    })
+    insert_row("water_logs", {
+        "user_id": st.session_state.get("user_id"),
+        "logged_at": now.isoformat(),
+        "amount_ml": amount,
     })
     st.success(f"Added {amount} ml of water!")
     st.rerun()

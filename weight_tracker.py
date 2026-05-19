@@ -4,6 +4,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 from datetime import datetime, timedelta
 import numpy as np
+from utils.supabase_client import insert_row, upsert_row
 
 
 def _get_weight_data():
@@ -495,6 +496,22 @@ def weight_tracker_tab():
 
         if st.button("Set Target", use_container_width=True):
             st.session_state.target_weight = target_weight
+            insert_row("health_targets", {
+                "user_id": st.session_state.get("user_id"),
+                "target_weight_kg": target_weight,
+                "ideal_weight_kg": st.session_state.get("ideal_weight"),
+                "bmi": st.session_state.get("bmi"),
+                "bmi_category": st.session_state.get("bmi_category"),
+                "bmr": st.session_state.get("bmr"),
+                "tdee": st.session_state.get("tdee"),
+                "adjusted_calories": st.session_state.get("adjusted_calories"),
+                "protein_g": st.session_state.get("protein_g"),
+                "carbs_g": st.session_state.get("carbs_g"),
+                "fat_g": st.session_state.get("fat_g"),
+                "body_fat_pct": st.session_state.get("body_fat_pct"),
+                "lean_body_mass_kg": st.session_state.get("lean_body_mass"),
+                "daily_water_ml": st.session_state.get("water_intake"),
+            })
             st.success(f"Target weight set to {target_weight} kg")
 
     with col2:
@@ -839,5 +856,14 @@ def log_weight(weight, date):
     date_str = date.strftime('%Y-%m-%d')
     st.session_state.weight_log[date_str] = weight
     st.session_state.current_weight = float(weight)
+    insert_row("weight_logs", {
+        "user_id": st.session_state.get("user_id"),
+        "logged_date": date_str,
+        "weight_kg": weight,
+    })
+    upsert_row("user_profiles", {
+        "user_id": st.session_state.get("user_id"),
+        "current_weight_kg": weight,
+    }, on_conflict="user_id")
     st.success(f"Weight logged: {weight} kg for {date.strftime('%B %d, %Y')}")
     st.rerun()

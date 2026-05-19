@@ -3,6 +3,7 @@ import pandas as pd
 import plotly.graph_objects as go
 from datetime import datetime, timedelta
 import calendar
+from utils.supabase_client import upsert_row
 
 
 def streaks_tab():
@@ -33,6 +34,14 @@ def streaks_tab():
 
     # Calculate streaks
     current_streak, longest_streak, streak_data = calculate_streaks()
+    logged_dates = [date_str for date_str, logged in streak_data.items() if logged]
+    upsert_row("user_streaks", {
+        "user_id": st.session_state.get("user_id"),
+        "current_meal_log_streak": current_streak,
+        "longest_meal_log_streak": longest_streak,
+        "total_logged_days": len(logged_dates),
+        "last_logged_date": max(logged_dates) if logged_dates else None,
+    }, on_conflict="user_id")
 
     # Display streak metrics with modern cards
     st.markdown("""

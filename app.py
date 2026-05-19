@@ -12,8 +12,6 @@ load_dotenv()
 
 from constants import DEFAULT_TARGETS
 
-
-
 from utils import (
     load_db, search_food_case_insensitive, convert_units_to_grams,
     get_display_amount_and_unit, calculate_nutrition_per_serving,
@@ -33,6 +31,7 @@ from utils.analytics import (
     create_weekly_nutrient_bar_chart, create_daily_calorie_pie_chart,
     create_protein_line_plot, calculate_weekly_summary_stats
 )
+from utils.supabase_client import insert_row, upsert_row
 
 # Global variables
 meal_tracking_df = None
@@ -621,6 +620,36 @@ with st.sidebar:
                 st.session_state.bmi = bmi
                 st.session_state.bmi_category = bmi_category
 
+                user_id = st.session_state.get("user_id")
+                upsert_row("user_profiles", {
+                    "user_id": user_id,
+                    "age": age,
+                    "gender": gender,
+                    "height_cm": height,
+                    "current_weight_kg": weight,
+                    "activity_level": activity_level,
+                    "goal": goal,
+                    "food_preference": food_preference,
+                    "allergies": [item.strip() for item in allergies.split(",") if item.strip()],
+                }, on_conflict="user_id")
+                insert_row("health_targets", {
+                    "user_id": user_id,
+                    "bmi": bmi,
+                    "bmi_category": bmi_category,
+                    "bmr": bmr,
+                    "tdee": tdee,
+                    "adjusted_calories": adjusted_calories,
+                    "protein_g": protein_g,
+                    "carbs_g": carbs_g,
+                    "fat_g": fat_g,
+                    "ideal_weight_kg": ideal_weight,
+                    "target_weight_kg": st.session_state.get("target_weight"),
+                    "body_fat_pct": body_fat_pct,
+                    "lean_body_mass_kg": lean_body_mass,
+                    "daily_water_ml": water_intake,
+                    "goal": goal,
+                })
+
             except Exception as e:
                 st.error(f"Error calculating metrics: {str(e)}")
 
@@ -1037,6 +1066,19 @@ with tab4:
                         st.session_state.daily_log[date_str] = []
 
                     st.session_state.daily_log[date_str].append(meal_entry)
+                    insert_row("meal_logs", {
+                        "user_id": st.session_state.get("user_id"),
+                        "logged_date": date_str,
+                        "meal_type": meal_type,
+                        "food_name": selected_food,
+                        "quantity": quantity,
+                        "unit": unit,
+                        "amount_display": meal_entry["Amount"],
+                        "calories": nutrition["Calories"],
+                        "protein_g": nutrition["Protein"],
+                        "carbs_g": nutrition["Carbs"],
+                        "fat_g": nutrition["Fat"],
+                    })
                     st.success(f"Added {selected_food} to {meal_type} for {selected_date.strftime('%B %d, %Y')}")
 
                 except Exception as e:
