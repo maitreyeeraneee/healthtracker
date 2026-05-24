@@ -1,277 +1,401 @@
 <!--
 ╔══════════════════════════════════════════════════════════════════════════════╗
 ║                                                                              ║
-║                               🌌 NutriVerse                                    ║
-║                    Professional Health Tracking Application                  ║
+║                               🌌 NutriVerse                                   ║
+║                 Intelligent Health & Nutrition Analytics Platform            ║
 ║                                                                              ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 -->
 
 <div align="center">
 
-<!-- ══════════════════════════════════════════════════════════════════════════ -->
-<!--                                BADGES                                      -->
-<!-- ══════════════════════════════════════════════════════════════════════════ -->
-
-[![Python](https://img.shields.io/badge/Python-3.8%2B-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
-[![Streamlit](https://img.shields.io/badge/Streamlit-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white)](https://streamlit.io/)
-[![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-blue?style=for-the-badge)]()
-
-<br/>
-<!-- ══════════════════════════════════════════════════════════════════════════ -->
-<!--                                HEADER                                      -->
-<!-- ══════════════════════════════════════════════════════════════════════════ -->
-
 <br/>
 
 # 🌌 NutriVerse
 
-### Your Personal AI-Powered Health & Nutrition Companion
+### Intelligent Health, Nutrition & Wellness Analytics Platform
 
-*A comprehensive Python-based health tracking application for monitoring nutrition, fitness, and wellness metrics with advanced analytics.*
-
-live link - https://healthtracking.streamlit.app/
+*A production-style AI/ML-powered health-tech application combining Data Science, NLP, Optimization Algorithms, Behavioral Intelligence, and Interactive Analytics into a single unified ecosystem.*
 
 <br/>
 
-[📖 Overview](#overview) • [✨ Features](#features) • [🛠️ Tech Stack](#tech-stack) • [📦 Installation](#installation) • [🚀 Usage](#usage) • [📂 Structure](#project-structure) • [🤝 Contributing](#contributing) • [👤 Author](#author)
+[![Python](https://img.shields.io/badge/Python-3.8%2B-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
+[![Streamlit](https://img.shields.io/badge/Streamlit-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white)](https://streamlit.io/)
+[![scikit-learn](https://img.shields.io/badge/scikit--learn-ML%20%26%20NLP-F7931E?style=for-the-badge&logo=scikitlearn&logoColor=white)]()
+[![Plotly](https://img.shields.io/badge/Plotly-Interactive%20Analytics-3F4F75?style=for-the-badge&logo=plotly&logoColor=white)]()
+[![Supabase](https://img.shields.io/badge/Supabase-Cloud%20Persistence-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white)]()
+[![PuLP](https://img.shields.io/badge/PuLP-Optimization-blue?style=for-the-badge)]()
+[![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-black?style=for-the-badge)]()
 
 <br/>
 
-
+### 🚀 Live Demo
+🔗 https://healthtracking.streamlit.app/
 
 
 </div>
 
 ---
 
-## 📖 Overview
+# 📖 Overview
 
-NutriVerse is a powerful, interactive health and nutrition tracking application built with **Python** and **Streamlit**. It helps users monitor daily health metrics, generate personalized meal plans using intelligent algorithms, and track their fitness progress over time with beautiful visualizations.
+NutriVerse is a full-scale intelligent health-tech platform designed to solve one of the biggest gaps in digital wellness systems — the lack of culturally relevant, data-driven, personalized nutrition intelligence for Indian users.
 
-### 🎯 What It Does
 
-| Capability | Description |
-|:-----------|:------------|
-| 📊 **Body Metrics** | BMI, BMR, TDEE, body fat %, lean mass calculations |
-| 🍽️ **Meal Planning** | AI-powered 7-day personalized meal plans |
-| 💧 **Health Tracking** | Water intake, weight logging, daily streaks |
-| 📈 **Analytics** | Interactive charts, trends, progress tracking |
+```diff
++ Clinical Health Analytics
++ NLP-Based Food Intelligence
++ Optimization-Driven Meal Planning
++ Behavioral Analytics
++ Interactive Visualization Systems
++ Cloud Persistence Infrastructure
++ Machine Learning Recommendation Engines
+```
 
-### 💡 Portfolio Project Demonstrates
+The platform leverages a curated database of **2000+ Indian and international food items** enriched with macronutrients, fiber, health scores, serving units, cuisine metadata, and dietary compatibility.
 
-This project showcases proficiency in:
+NutriVerse was built as an advanced interdisciplinary Data Science project integrating:
 
-| Skill Area | Technologies Used |
-|:-----------|:------------------|
-| 🐍 **Python Development** | Clean code, OOP, data structures, algorithms |
-| 🌐 **Web Development** | Streamlit web framework, responsive UI |
-| 📊 **Data Science** | Pandas, NumPy for data processing |
-| 📈 **Visualization** | Plotly, Matplotlib for interactive charts |
-| 🤖 **Machine Learning** | scikit-learn for predictive features |
-| ⚙️ **Optimization** | PuLP for mathematical meal planning optimization |
-
----
-
-## ✨ Features
-
-### 📊 Health Metrics Dashboard
-
-- **BMI Calculator** — Instant Body Mass Index calculation with health categorization
-- **BMR & TDEE** — Basal Metabolic Rate and Total Daily Energy Expenditure
-- **Body Composition** — Body fat percentage, lean body mass, ideal weight calculations
-- **Macro Targets** — Personalized protein, carbs, and fat goals based on objectives
-
-### 🍽️ Intelligent Meal Planning
-
-- **7-Day Meal Plan Generator** — Personalized weekly meal plans tailored to user goals
-- **Smart Food Swaps** — AI-powered food substitutions for variety and nutrition
-- **Dietary Preferences** — Support for Vegetarian and Vegan diets
-- **Allergy Filtering** — Exclude allergens from meal plans
-
-### 📈 Analytics & Visualization
-
-- **Daily Trends** — Interactive charts for daily nutrition tracking
-- **Weekly Summaries** — Comprehensive weekly nutrition breakdowns
-- **Macro Distribution** — Pie charts showing macro ratios
-- **Protein Tracking** — Line plots for protein intake trends
-- **Progress Bars** — Visual progress towards daily targets
-
-### 💧 Holistic Health Tracking
-
-- **Water Intake** — Track daily hydration with visual progress
-- **Weight Tracking** — Log and visualize weight changes over time
-- **Streak System** — Daily tracking streaks for motivation
+- Machine Learning
+- Natural Language Processing
+- Mathematical Optimization
+- Data Engineering
+- Analytics Visualization
+- Health Informatics
+- Cloud-backed Persistence Systems
 
 ---
 
-## 🛠️ Tech Stack
+# 🎯 Problem Statement
 
-| Category | Technology |
-|:---------|:-----------|
-| **Language** | Python 3.8+ |
-| **Web Framework** | Streamlit |
+Modern nutrition applications suffer from major limitations:
+
+❌ Western-centric food databases  
+❌ Lack of Indian meal intelligence  
+❌ Generic calorie recommendations  
+❌ Weak personalization systems  
+❌ No real behavioral analytics  
+❌ Expensive API-dependent AI assistants  
+❌ Poor integration between tracking, planning, and analytics  
+
+NutriVerse solves these problems through a locally intelligent, optimization-driven, AI-enhanced nutrition platform designed specifically around real-world Indian dietary patterns and personalized physiological analytics.
+
+---
+
+# ✨ Features
+
+# 📊 Clinical Health Analytics Engine
+
+### Advanced Physiological Computation System
+
+✔ BMI (Body Mass Index)  
+✔ BMR using Mifflin-St Jeor Equation  
+✔ TDEE using Harris-Benedict Multipliers  
+✔ Body Fat % using Deurenberg Formula  
+✔ Lean Body Mass Calculation  
+✔ Ideal Body Weight using Devine Formula  
+✔ Personalized Macronutrient Targets  
+✔ Goal-based Calorie Adjustments  
+
+---
+
+# 🍽️ Intelligent Meal Planning Engine
+
+### Optimization-Driven Personalized Nutrition
+
+✔ Automated 7-Day Meal Plan Generation  
+✔ Indian-first food intelligence system  
+✔ Goal-specific macro balancing  
+✔ Vegetarian & Vegan filtering  
+✔ Allergen exclusion engine  
+✔ Dynamic meal slot generation  
+✔ Optimization fallback using Linear Programming (PuLP)  
+✔ Realistic Indian food allowlists & hard-ban logic  
+
+---
+
+# 🧠 AI & Machine Learning Components
+
+## 🔍 NLP-Based Nutrition Assistant
+
+A local TF-IDF retrieval engine capable of answering nutrition-related food queries without external APIs.
+
+### Core Technologies
+
+- TF-IDF Vectorization
+- Cosine Similarity Ranking
+- Bigram Text Mining
+- Semantic Food Retrieval
+- Local Inference Pipeline
+
+### Capabilities
+
+✔ Nutrition query answering  
+✔ Similar food retrieval  
+✔ Smart contextual recommendations  
+✔ Privacy-focused offline intelligence  
+✔ Sub-second retrieval performance  
+
+---
+
+## ⚡ Smart Food Swap Recommendation Engine
+
+Machine Learning-powered recommendation system that suggests healthier food alternatives using semantic similarity scoring and nutritional ranking.
+
+### Recommendation Pipeline
+
+```python
+TF-IDF Similarity
+        ↓
+Cosine Similarity Ranking
+        ↓
+Nutritional Re-ranking
+        ↓
+Protein Improvement Bonus
+        ↓
+Final Smart Swap Recommendation
+```
+
+### Example
+
+```text
+White Bread → Multigrain Bread
+Reason:
+Higher protein + better fiber profile
+```
+
+---
+
+# 📈 Analytics & Behavioral Intelligence
+
+NutriVerse includes a complete analytics ecosystem for tracking long-term health behavior patterns.
+
+### Interactive Analytics
+
+✔ Daily nutrition trends  
+✔ Weekly & monthly summaries  
+✔ Macronutrient distribution analytics  
+✔ Meal-wise nutritional breakdowns  
+✔ Protein trend visualization  
+✔ Interactive Plotly dashboards  
+✔ Real-time progress tracking  
+
+### Behavioral Intelligence System
+
+✔ Daily streak tracking  
+✔ GitHub-style consistency heatmaps  
+✔ Water intake monitoring  
+✔ Weight trend projections  
+✔ Habit consistency analytics  
+✔ Calorie-deficit projection system  
+
+---
+
+# ☁️ Cloud Persistence Layer
+
+### Supabase + PostgreSQL Infrastructure
+
+NutriVerse integrates cloud persistence using Supabase for secure and scalable data storage.
+
+### Stored Entities
+
+- User Profiles
+- Meal Logs
+- Water Tracking Data
+- Weight Tracking History
+- Streak Analytics
+- Historical Nutrition Data
+
+### Engineering Features
+
+✔ Secure environment variable handling  
+✔ Silent fallback logic  
+✔ Session persistence  
+✔ Offline-capable architecture  
+✔ Modular backend integration  
+
+---
+
+# 🏗️ System Architecture
+
+```text
+User Inputs
+(Profile + Goals + Preferences)
+                ↓
+      Streamlit Presentation Layer
+                ↓
+      Health Analytics Engine
+(BMI + BMR + TDEE + Body Fat %)
+                ↓
+      Meal Optimization Engine
+     ↙                     ↘
+TF-IDF NLP System      PuLP LP Solver
+     ↘                     ↙
+    Nutrient Intelligence Engine
+                ↓
+      Analytics & Visualization
+                ↓
+      Supabase Cloud Database
+```
+
+---
+
+# ⚙️ Core Algorithms & Technologies
+
+| Domain | Technologies / Methods |
+|:--|:--|
+| Machine Learning | scikit-learn |
+| NLP | TF-IDF Vectorization |
+| Recommendation Systems | Cosine Similarity |
+| Optimization | PuLP Linear Programming |
+| Analytics | Pandas + NumPy |
+| Visualization | Plotly |
+| Cloud Backend | Supabase PostgreSQL |
+| Frontend | Streamlit |
+| Data Engineering | CSV Processing + Aggregation Pipelines |
+| Statistical Analysis | Trend Slope Computation |
+| Health Informatics | Clinical Formula Modeling |
+
+---
+
+# 📊 Tech Stack
+
+| Category | Technologies |
+|:--|:--|
+| **Programming Language** | Python 3.8+ |
+| **Frontend Framework** | Streamlit |
 | **Data Processing** | Pandas, NumPy |
 | **Machine Learning** | scikit-learn |
-| **Optimization** | PuLP |
-| **Visualization** | Plotly, Matplotlib |
+| **NLP & Retrieval** | TF-IDF, Cosine Similarity |
+| **Optimization** | PuLP Linear Programming |
+| **Visualization** | Plotly Express, Plotly Graph Objects |
+| **Backend Persistence** | Supabase |
+| **Database** | PostgreSQL |
+| **Environment Management** | python-dotenv |
+| **Version Control** | Git & GitHub |
 
 ---
 
-## 📦 Installation
+#  Highlights
 
-### Prerequisites
+### This project demonstrates strong practical experience in:
 
-- Python 3.8 or higher
-- pip package manager
-
-### Step-by-Step Setup
-
-```bash
-# STEP 1: Clone the Repository
-git clone https://github.com/Maitreyee/NutriVerse.git
-cd NutriVerse
-
-# STEP 2: Create Virtual Environment
-python -m venv venv
-
-# STEP 3: Activate Environment
-# Windows:
-venv\Scripts\activate
-# macOS / Linux:
-source venv/bin/activate
-
-# STEP 4: Install Dependencies
-pip install -r requirements.txt
-
-# STEP 5: Run the Application
-streamlit run app.py
-```
+✔ End-to-end Data Science system development  
+✔ Production-style Python architecture  
+✔ Machine Learning recommendation systems  
+✔ NLP retrieval systems  
+✔ Mathematical optimization  
+✔ Data visualization engineering  
+✔ Health-tech application design  
+✔ Cloud persistence integration  
+✔ Behavioral analytics systems  
+✔ Interactive dashboard development  
+✔ Algorithm design & implementation  
+✔ Scalable modular architecture  
+✔ Real-world problem solving  
 
 ---
 
-## 🚀 Usage
+# 🚀 Why This Project Stands Out
 
-### Starting the Application
+Unlike typical academic dashboards, NutriVerse integrates:
 
-```bash
-streamlit run app.py
-```
+- AI/ML systems
+- Optimization algorithms
+- Recommendation engines
+- Behavioral intelligence
+- Interactive analytics
+- Cloud persistence
+- NLP retrieval
+- Health-tech engineering
 
-The application will open in your browser at **`http://localhost:8501`**
+inside a single cohesive production-style application.
 
-### Getting Started Guide
-
-| Step | Action | What to Do |
-|:----:|:-------|:-----------|
-| 1️⃣ | **Set Profile** | Enter age, weight, height, gender in sidebar |
-| 2️⃣ | **Choose Goal** | Select activity level & fitness objective |
-| 3️⃣ | **Calculate** | Click "Calculate My Needs" for personalized targets |
-| 4️⃣ | **Track** | Generate meal plan or start manual tracking |
+This project was designed to simulate a real startup-grade intelligent wellness platform rather than a basic student CRUD application.
 
 ---
 
-## 📂 Project Structure
 
-```
-NutriVerse/
-│
-├── app.py                      # Main Streamlit application
-├── constants.py                # Configuration constants
-├── requirements.txt            # Python dependencies
-│
-├── data/                       # Data directory
-│   ├── nutrition_data_optimized.csv   # Food nutrition database
-│   └── tips.csv                       # Health tips
-│
-├── utils/                      # Utility modules
-│   ├── __init__.py            # Package initialization
-│   ├── analytics.py           # Chart & visualization functions
-│   ├── data_loader.py         # Data loading utilities
-│   ├── meal_generator.py      # Meal plan generation logic
-│   └── ui_components.py       # Reusable UI components
-│
-├── water_tracker.py           # Water intake tracking
-├── weight_tracker.py          # Weight tracking
-└── streaks.py                 # Daily streak system
-```
+# 🚀 Usage
 
-### File Descriptions
+## Step 1 — Setup User Profile
 
-| File | Purpose |
-|:-----|:--------|
-| `app.py` | Main application entry point with UI and routing |
-| `constants.py` | Configuration constants (BMI categories, macro ratios, activity multipliers) |
-| `requirements.txt` | Python dependencies |
-| `utils/analytics.py` | Plotly chart generation for visualizations |
-| `utils/data_loader.py` | CSV and database loading utilities |
-| `utils/meal_generator.py` | Meal plan generation using optimization algorithms |
-| `utils/ui_components.py` | Reusable Streamlit UI components |
-| `water_tracker.py` | Water intake tracking module |
-| `weight_tracker.py` | Weight logging and trend visualization |
-| `streaks.py` | Daily tracking streak system |
+Enter:
+
+- Age
+- Weight
+- Height
+- Gender
+- Activity Level
+- Dietary Preference
+- Allergens
+- Fitness Goal
 
 ---
 
-## 🤝 Contributing
+## Step 2 — Generate Metrics
 
-Contributions are welcome! Here's how you can help:
-
-```bash
-# 1. Fork the repository
-# Click the "Fork" button on GitHub
-
-# 2. Clone your fork
-git clone https://github.com/YOUR_USERNAME/NutriVerse.git
-cd NutriVerse
-
-# 3. Create a feature branch
-git checkout -b feature/amazing-feature
-
-# 4. Make your changes
-# - Follow the existing code style
-# - Add tests if applicable
-# - Update documentation
-
-# 5. Commit and push
-git add .
-git commit -m 'Add amazing feature'
-git push origin feature/amazing-feature
-
-# 6. Open a Pull Request
-```
+- BMI
+- BMR
+- TDEE
+- Body Fat %
+- Lean Body Mass
+- Ideal Body Weight
+- Daily Calorie Targets
+- Macro Targets
 
 ---
 
-## 👤 Author
+## Step 3 — Generate Personalized Meal Plans
+
+✔ 7-day intelligent meal plans  
+✔ Macro-balanced nutrition  
+✔ Personalized calorie allocation  
+✔ Goal-specific recommendations  
+
+---
+
+## Step 4 — Track & Analyze
+
+Users can:
+
+✔ Log meals  
+✔ Track hydration  
+✔ Monitor weight trends  
+✔ Analyze macro patterns  
+✔ View progress dashboards  
+✔ Build tracking streaks  
+
+
+---
+
+# Author
 
 <div align="center">
 
-### Maitreyee
+<img src="https://capsule-render.vercel.app/api?type=rect&color=0:0f172a,100:10b981&height=2"/>
 
-| Contact | Link |
-|:--------|:-----|
-| 🐙 **GitHub** | [@Maitreyee](https://github.com/maitreyeeraneee) |
-| 💼 **LinkedIn** | [Maitreyee](https://www.linkedin.com/in/maitreyeerane/) |
-
----
-
-**Python Developer | Data Science Enthusiast | Open Source Contributor**
-
-</div>
-
----
-
-<div align="center">
-
-![----------------------------------------------------](https://capsule-render.vercel.app/api?type=waving&color=gradient&height=80&section=footer)
+### Maitreyee Rane
 
 <br/>
 
-### ⭐ Star this repo if you found it useful!!
+<a href="https://github.com/maitreyeeraneee">
+<img src="https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github"/>
+</a>
+
+<a href="https://www.linkedin.com/in/maitreyeerane/">
+<img src="https://img.shields.io/badge/LinkedIn-0A66C2?style=for-the-badge&logo=linkedin"/>
+</a>
+<br/><br/>
+
+*⭐ star this repo if you found it useful!*
+
+*contributions are welcomeee*
+
+*thanks for visiting!!*
 
 <br/>
 
-**Built with ❤️ using Python & Streamlit**
+<img src="https://capsule-render.vercel.app/api?type=waving&color=0:10b981,100:0f172a&height=120&section=footer"/>
 
 </div>
